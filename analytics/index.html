@@ -17,6 +17,11 @@
 </nav>
 
 <body>
+      <!-- Access restriction: only owners -->
+  <script src="../../js/session.js"></script>
+  <script>
+    requireRole(['owner']); 
+  </script>
 <header>
     <h1>🌸 Floral Analytics Dashboard 🌸</h1>
 </header>
