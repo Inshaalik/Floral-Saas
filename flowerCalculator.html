@@ -17,6 +17,13 @@
 </nav>
 
 <body>
+    <body>
+  <!-- Access restriction: owners and sub-users -->
+  <script src="js/session.js"></script>
+  <script>
+    requireRole(['owner', 'sub-user']); 
+  </script>
+
 
 <header>
     <h1>🌸 Floral Budget Calculator 🌸</h1>
