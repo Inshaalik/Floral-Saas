@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Floral SaaS Admin</title>
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+    <header>
+        <h1>🌸 Floral SaaS Admin Dashboard 🌸</h1>
+    </header>
+
+    <main>
+        <!-- Flowers Section -->
+        <section>
+            <h2>Flowers</h2>
+            <table id="flowersTable">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Price per Stem ($)</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <button id="addFlower">Add Flower</button>
+            <button id="saveFlowers">Save Flowers</button>
+        </section>
+
+        <!-- Hard Goods Section -->
+        <section>
+            <h2>Hard Goods</h2>
+            <table id="hardGoodsTable">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Price ($)</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <button id="addHardGood">Add Hard Good</button>
+            <button id="saveHardGoods">Save Hard Goods</button>
+        </section>
+
+        <!-- Percentages Section -->
+        <section>
+            <h2>Default Percentages</h2>
+            <label>Greens (%): <input type="number" id="greensPercent" value="0"></label><br>
+            <label>Wastage (%): <input type="number" id="wastagePercent" value="0"></label><br>
+            <label>CC Fee (%): <input type="number" id="ccFeePercent" value="0"></label><br>
+            <button id="savePercentages">Save Percentages</button>
+        </section>
+
+        <!-- Designers Section -->
+        <section>
+            <h2>Designers</h2>
+            <table id="designerTable">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="designerList"></tbody>
+            </table>
+            <input type="text" id="newDesigner" placeholder="Add new designer">
+            <button id="addDesigner">Add Designer</button>
+            <button id="saveDesigners">Save Designers</button>
+        </section>
+    </main>
+
+ <!-- Load shared data first -->
+<script src="../js/sharedData.js"></script>
+<!-- Then load admin logic -->
+<script src="admin.js"></script>
+
+</body>
+</html>

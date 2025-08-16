@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Floral Budget Calculator</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header>
+    <h1>🌸 Floral Budget Calculator 🌸</h1>
+</header>
+
+<main>
+    <!-- Recipe Info -->
+    <section>
+        <h2>Recipe Name</h2>
+        <input type="text" id="recipeName" placeholder="Enter recipe name">
+
+        <h2>Designer</h2>
+        <select id="designerSelect">
+            <option value="">--Select Designer--</option>
+        </select>
+    </section>
+
+    <!-- Customer Price -->
+    <section>
+        <h2>Customer Price</h2>
+        <input type="number" id="customerPrice" value="0">
+    </section>
+
+    <!-- Hard Goods -->
+    <section>
+        <h2>Hard Goods</h2>
+        <select id="hardGoodsSelect">
+            <option value="">--Select Hard Good--</option>
+        </select>
+    </section>
+
+    <!-- Flowers -->
+    <section>
+        <h2>Flowers</h2>
+        <div id="flowerList"></div>
+        <button id="addFlowerButton">Add Flower</button>
+    </section>
+
+    <!-- Other Costs / Percentages -->
+    <section>
+        <h2>Other Costs / Percentages</h2>
+        <label>Greens: $<input type="number" id="greens" value="0"></label><br>
+        <label>Wastage: $<input type="number" id="wastage" value="0"></label><br>
+        <label>CC Fee: $<input type="number" id="ccFee" value="0"></label><br>
+    </section>
+
+    <!-- Totals -->
+    <section>
+        <h2>Total Flower Cost: $<span id="flowerTotal">0</span></h2>
+        <h2>Remaining Budget: $<span id="remaining">0</span></h2>
+    </section>
+    <section>
+    <button id="saveRecipeButton">Save Recipe</button>
+</section>
+
+</main>
+
+<script src="js/sharedData.js"></script>
+<script src="js/script.js"></script>
+
+</body>
+</html>

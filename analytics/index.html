@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Floral Analytics</title>
+    <link rel="stylesheet" href="analytics.css">
+</head>
+<body>
+<header>
+    <h1>🌸 Floral Analytics Dashboard 🌸</h1>
+</header>
+
+<main>
+    <!-- Filters -->
+    <section>
+        <h2>Filters</h2>
+        <label>Designer:
+            <select id="designerFilter">
+                <option value="">All</option>
+            </select>
+        </label>
+        <label>Flower:
+            <select id="flowerFilter">
+                <option value="">All</option>
+            </select>
+        </label>
+        <label>Date From: <input type="date" id="dateFrom"></label>
+        <label>Date To: <input type="date" id="dateTo"></label>
+        <button id="applyFilters">Apply</button>
+    </section>
+
+    <!-- Analytics Table -->
+    <section>
+        <h2>Recipe Data</h2>
+        <table id="analyticsTable">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Recipe Name</th>
+                    <th>Designer</th>
+                    <th>Flowers</th>
+                    <th>Hard Goods</th>
+                    <th>Greens ($)</th>
+                    <th>Wastage ($)</th>
+                    <th>CC Fee ($)</th>
+                    <th>Total Cost ($)</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </section>
+
+</main>
+
+<script src="../js/sharedData.js"></script>
+<script src="analytics.js"></script>
+</body>
+</html>

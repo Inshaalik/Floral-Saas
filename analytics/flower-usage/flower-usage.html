@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flower & Hard Goods Usage Analytics</title>
+  <link rel="stylesheet" href="css/flower-usage.css">
+</head>
+<body>
+
+<header>
+  <h1>🌸 Flower & Hard Goods Usage Analytics 🌸</h1>
+</header>
+
+<main>
+  <section>
+    <label for="dateRange">Select Time Frame: </label>
+    <select id="dateRange">
+      <option value="thisWeek">This Week</option>
+      <option value="thisMonth">This Month</option>
+      <option value="last30Days">Last 30 Days</option>
+      <option value="thisYear">This Year</option>
+    </select>
+  </section>
+
+  <section>
+    <table id="usageTable" border="1">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Quantity</th>
+          <th>Total Cost</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Data will be populated here -->
+      </tbody>
+    </table>
+  </section>
+</main>
+
+<script src="../../js/sharedData.js"></script>
+<script src="flower-usage.js"></script>
+
+</body>
+</html>
