@@ -6,25 +6,49 @@
   <title>Floral SaaS</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
-
 <body>
-  <header>
+  <!-- Navigation -->
+  <nav>
+    <ul>
+      <li><a href="#home">Home</a></li>
+      <li><a href="#about">About Us</a></li>
+      <li><a href="#contact">Contact</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+      <li><a href="login/login.html">Login</a></li>
+      <li><a href="#signup">Sign Up</a></li>
+    </ul>
+  </nav>
+
+  <!-- Hero / Welcome Section -->
+  <header id="home">
     <h1>🌸 Welcome to Floral SaaS 🌸</h1>
     <p>Your all-in-one tool for floral recipes, pricing, and analytics.</p>
+    <button onclick="location.href='login/login.html'">🌼 Login to Your Account</button>
   </header>
-  <nav>
-  <ul class="nav-menu">
-    <li><a href="index.html">🏠 Home</a></li>
-    <li><a href="flowerCalculator.html">🌼 Flower Calculator</a></li>
-    <li><a href="admin/index.html">⚙️ Admin Dashboard</a></li>
-    <li><a href="analytics/index.html">📊 Analytics</a></li>
-    <li><a href="analytics/flower-usage/flower-usage.html">📈 Flower Usage</a></li>
-  </ul>
-</nav>
-  <main>
-    <button onclick="location.href='flowerCalculator.html'">🌼 Open App</button>
-    <button onclick="location.href='admin/index.html'">⚙️ Admin Dashboard</button>
-    <button onclick="location.href='analytics/index.html'">📊 Analytics</button>
-  </main>
+
+  <!-- About Section -->
+  <section id="about">
+    <h2>About Us</h2>
+    <p>Floral SaaS helps florists manage recipes, calculate costs, and track analytics easily.</p>
+  </section>
+
+  <!-- Pricing Section -->
+  <section id="pricing">
+    <h2>Pricing</h2>
+    <p>Choose the subscription that fits your shop.</p>
+  </section>
+
+  <!-- Contact Section -->
+  <section id="contact">
+    <h2>Contact</h2>
+    <p>Email us at support@floralsaas.com</p>
+  </section>
+
+  <!-- Signup Section -->
+  <section id="signup">
+    <h2>Sign Up</h2>
+    <p>Get started with your shop today!</p>
+    <button onclick="location.href='login/login.html'">Sign Up / Login</button>
+  </section>
 </body>
 </html>
