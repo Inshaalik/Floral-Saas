@@ -23,11 +23,9 @@ loginForm?.addEventListener('submit', (e) => {
     localStorage.setItem('currentUser', JSON.stringify(user));
     alert(`Logged in as ${user.email} (${user.role})`);
 
-    // Redirect based on role
-    if (user.role === "owner") {
+      // Redirect based on role
+    if (user.role === "owner" || user.role === "sub-user") {
       window.location.href = '../flowerCalculator.html';
-    } else if (user.role === "sub-user") {
-      window.location.href = '../flowerCalculator.html'; // can later restrict features
     }
   } else {
     alert('Invalid email or password');
