@@ -6,6 +6,13 @@
     <title>Floral Budget Calculator</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
+         <body>
+  <!-- Access restriction: owners and sub-users -->
+  <script src="js/session.js"></script>
+  <script>
+    requireRole(['owner', 'sub-user']); 
+  </script>
+             
     <nav>
   <ul class="nav-menu">
     <li><a href="index.html">🏠 Home</a></li>
@@ -15,14 +22,6 @@
     <li><a href="analytics/flower-usage/flower-usage.html">📈 Flower Usage</a></li>
   </ul>
 </nav>
-
-<body>
-    <body>
-  <!-- Access restriction: owners and sub-users -->
-  <script src="js/session.js"></script>
-  <script>
-    requireRole(['owner', 'sub-user']); 
-  </script>
 
 
 <header>
