@@ -3,8 +3,8 @@
 // Hardcoded users for demo purposes
 const users = [
   { email: "owner@flowershop.com", password: "owner123", role: "owner" },
-  { email: "subuser1@flowershop.com", password: "sub123", role: "subuser" },
-  { email: "subuser2@flowershop.com", password: "sub456", role: "subuser" }
+  { email: "subuser1@flowershop.com", password: "sub123", role: "sub-user" },
+  { email: "subuser2@flowershop.com", password: "sub456", role: "sub-user" }
 ];
 
 const loginForm = document.getElementById('loginForm');
@@ -26,7 +26,7 @@ loginForm?.addEventListener('submit', (e) => {
     // Redirect based on role
     if (user.role === "owner") {
       window.location.href = '../flowerCalculator.html';
-    } else if (user.role === "subuser") {
+    } else if (user.role === "sub-user") {
       window.location.href = '../flowerCalculator.html'; // can later restrict features
     }
   } else {
