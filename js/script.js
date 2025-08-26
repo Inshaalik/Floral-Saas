@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let flowersData = masterFlowers || [];      // From admin table
     let hardGoodsData = masterHardGoods || [];
-    let percentagesData = masterPercentages || { greens: 0, wastage: 0, ccFee: 0 };
+    let percentagesData = masterPercentages || { greens: 0, wastage: 0, ccfee: 0 };
     let designersData = masterDesigners || [];
 
     // ----- DOM Elements -----
@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const customerPriceInput = document.getElementById("customerPrice");
     const greensInput = document.getElementById("greens");
     const wastageInput = document.getElementById("wastage");
-    const ccFeeInput = document.getElementById("ccFee");
+    const ccfeeInput = document.getElementById("ccfee");
     const flowerTotalOutput = document.getElementById("flowerTotal");
     const remainingOutput = document.getElementById("remaining");
     const saveRecipeButton = document.getElementById("saveRecipeButton");
@@ -52,7 +52,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function addFlowerListeners() {
-        // When flower is selected, pull retail price
         document.querySelectorAll(".flowerSelect").forEach(select => {
             select.addEventListener("change", e => {
                 const i = e.target.dataset.index;
@@ -64,7 +63,6 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         });
 
-        // Update quantity
         document.querySelectorAll(".quantityInput").forEach(input => {
             input.addEventListener("input", e => {
                 const i = e.target.dataset.index;
@@ -73,7 +71,6 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         });
 
-        // Remove flower
         document.querySelectorAll(".removeButton").forEach(button => {
             button.addEventListener("click", e => {
                 const i = e.target.dataset.index;
@@ -113,13 +110,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const greensValue = (percentagesData.greens / 100) * customerPrice;
         const wastageValue = (percentagesData.wastage / 100) * customerPrice;
-        const ccFeeValue = (percentagesData.ccFee / 100) * customerPrice;
+        const ccfeeValue = (percentagesData.ccfee / 100) * customerPrice;
 
         greensInput.value = greensValue.toFixed(2);
         wastageInput.value = wastageValue.toFixed(2);
-        ccFeeInput.value = ccFeeValue.toFixed(2);
+        ccfeeInput.value = ccfeeValue.toFixed(2);
 
-        const totalCosts = flowerTotal + hardGoodsCost + greensValue + wastageValue + ccFeeValue;
+        const totalCosts = flowerTotal + hardGoodsCost + greensValue + wastageValue + ccfeeValue;
         remainingOutput.textContent = (customerPrice - totalCosts).toFixed(2);
     }
 
@@ -152,7 +149,7 @@ document.addEventListener("DOMContentLoaded", () => {
             percentages: {
                 greens: Number(greensInput.value),
                 wastage: Number(wastageInput.value),
-                ccFee: Number(ccFeeInput.value)
+                ccfee: Number(ccfeeInput.value)
             }
         };
 
@@ -172,7 +169,7 @@ document.addEventListener("DOMContentLoaded", () => {
         loadSharedData();
         flowersData = masterFlowers || [];
         hardGoodsData = masterHardGoods || [];
-        percentagesData = masterPercentages || { greens: 0, wastage: 0, ccFee: 0 };
+        percentagesData = masterPercentages || { greens: 0, wastage: 0, ccfee: 0 };
         designersData = masterDesigners || [];
 
         renderFlowers();
