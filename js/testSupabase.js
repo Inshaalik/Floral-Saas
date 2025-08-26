@@ -1,8 +1,12 @@
-import { supabase } from './supabaseClient.js'  // adjust path if needed
+import { supabase } from './supabaseClient.js';
 
-async function testDB() {
-  const { data, error } = await supabase.from('tenants').select('*')
-  console.log('Supabase tenants test:', data, error)
+export async function getFlowers() {
+  const { data, error } = await supabase
+    .from('flowers')
+    .select('id, name, wholesale, markup, retail'); // include retail
+  if (error) {
+    console.error('Error fetching flowers:', error);
+    return [];
+  }
+  return data;
 }
-
-testDB()
