@@ -1,12 +1,13 @@
 // admin/admin.js
 import { supabase } from "../js/supabaseClient.js";
+import { v4 as uuidv4 } from 'https://jspm.dev/uuid';
 
 document.addEventListener("DOMContentLoaded", () => {
     // ----- Local copies of master data -----
     let flowers = [];
     let hardGoods = [];
     let designers = [];
-    let percentages = { greens: 0, wastage: 0, ccFee: 0 };
+    let percentages = { id: uuidv4(), greens: 0, wastage: 0, ccfee: 0 };
 
     // ----- DOM Elements -----
     const flowersTable = document.querySelector("#flowersTable tbody");
@@ -24,22 +25,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const greensInput = document.getElementById("greensPercent");
     const wastageInput = document.getElementById("wastagePercent");
-    const ccFeeInput = document.getElementById("ccfeePercent");
+    const ccfeeInput = document.getElementById("ccfeePercent");
 
     // ----- Render Functions -----
     function renderFlowers() {
-        flowersTable.innerHTML = "";
-        flowers.forEach((flower, i) => {
-            const row = document.createElement("tr");
-            row.innerHTML = `
-                <td><input type="text" data-index="${i}" class="flowerName" value="${flower.name}"></td>
-                <td><input type="number" data-index="${i}" class="flowerPrice" value="${flower.price}"></td>
-                <td><button data-index="${i}" class="removeFlower">Remove</button></td>
-            `;
-            flowersTable.appendChild(row);
-        });
-        addFlowerListeners();
-    }
+    flowersTable.innerHTML = "";
+    flowers.forEach((flower, i) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td><input type="text" data-index="${i}" class="flowerName" value="${flower.name}"></td>
+            <td><input type="number" step="0.01" data-index="${i}" class="flowerWholesale" value="${flower.wholesale || 0}"></td>
+            <td><input type="number" step="0.01" data-index="${i}" class="flowerMarkup" value="${flower.markup || 0}"></td>
+            <td><input type="number" step="0.01" data-index="${i}" class="flowerRetail" value="${flower.retail || 0}"></td>
+            <td><button data-index="${i}" class="removeFlower">Remove</button></td>
+        `;
+        flowersTable.appendChild(row);
+    });
+    addFlowerListeners();
+}
+
 
     function renderHardGoods() {
         hardGoodsTable.innerHTML = "";
@@ -60,7 +64,7 @@ document.addEventListener("DOMContentLoaded", () => {
         designers.forEach((designer, i) => {
             const row = document.createElement("tr");
             row.innerHTML = `
-                <td><input type="text" data-index="${i}" class="designerName" value="${designer}"></td>
+                <td><input type="text" data-index="${i}" class="designerName" value="${designer.name}"></td>
                 <td><button data-index="${i}" class="removeDesigner">Remove</button></td>
             `;
             designerList.appendChild(row);
@@ -70,23 +74,55 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // ----- Listeners -----
     function addFlowerListeners() {
-        document.querySelectorAll(".flowerName").forEach(input => {
-            input.addEventListener("input", e => {
-                flowers[e.target.dataset.index].name = e.target.value;
-            });
+    document.querySelectorAll(".flowerName").forEach(input => {
+        input.addEventListener("input", e => {
+            flowers[e.target.dataset.index].name = e.target.value;
         });
-        document.querySelectorAll(".flowerPrice").forEach(input => {
-            input.addEventListener("input", e => {
-                flowers[e.target.dataset.index].price = Number(e.target.value);
-            });
+    });
+
+    // Wholesale input
+    document.querySelectorAll(".flowerWholesale").forEach(input => {
+        input.addEventListener("input", e => {
+            const i = e.target.dataset.index;
+            flowers[i].wholesale = Number(e.target.value);
+            // recalc retail
+            flowers[i].retail = +(flowers[i].wholesale * (1 + (flowers[i].markup || 0)/100)).toFixed(2);
+            renderFlowers();
         });
-        document.querySelectorAll(".removeFlower").forEach(btn => {
-            btn.addEventListener("click", e => {
-                flowers.splice(e.target.dataset.index, 1);
-                renderFlowers();
-            });
+    });
+
+    // Markup input
+    document.querySelectorAll(".flowerMarkup").forEach(input => {
+        input.addEventListener("input", e => {
+            const i = e.target.dataset.index;
+            flowers[i].markup = Number(e.target.value);
+            // recalc retail
+            flowers[i].retail = +(flowers[i].wholesale * (1 + flowers[i].markup/100)).toFixed(2);
+            renderFlowers();
         });
-    }
+    });
+
+    // Retail input
+    document.querySelectorAll(".flowerRetail").forEach(input => {
+        input.addEventListener("input", e => {
+            const i = e.target.dataset.index;
+            flowers[i].retail = Number(e.target.value);
+            // recalc markup
+            if(flowers[i].wholesale > 0){
+                flowers[i].markup = +(((flowers[i].retail / flowers[i].wholesale) - 1) * 100).toFixed(2);
+            }
+            renderFlowers();
+        });
+    });
+
+    document.querySelectorAll(".removeFlower").forEach(btn => {
+        btn.addEventListener("click", e => {
+            flowers.splice(e.target.dataset.index, 1);
+            renderFlowers();
+        });
+    });
+}
+
 
     function addHardGoodListeners() {
         document.querySelectorAll(".hardGoodName").forEach(input => {
@@ -110,7 +146,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function addDesignerListeners() {
         document.querySelectorAll(".designerName").forEach(input => {
             input.addEventListener("input", e => {
-                designers[e.target.dataset.index] = e.target.value;
+                designers[e.target.dataset.index].name = e.target.value;
             });
         });
         document.querySelectorAll(".removeDesigner").forEach(btn => {
@@ -122,26 +158,28 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ----- Button Events -----
-    addFlowerButton.addEventListener("click", () => {
-        flowers.push({ name: "", price: 0 });
-        renderFlowers();
-    });
+   addFlowerButton.addEventListener("click", () => {
+    flowers.push({ name: "", wholesale: 0, markup: 0, retail: 0 });
+    renderFlowers();
+});
 
     saveFlowersButton.addEventListener("click", async () => {
-        await supabase.from("flowers").delete().neq("id", 0);
-        const { error } = await supabase.from("flowers").insert(flowers);
+        const { error } = await supabase
+            .from("flowers")
+            .upsert(flowers, { onConflict: "id" });
         if (error) console.error(error);
         else alert("Flowers saved to Supabase!");
     });
 
     addHardGoodButton.addEventListener("click", () => {
-        hardGoods.push({ name: "", price: 0 });
+        hardGoods.push({ id: uuidv4(), name: "", price: 0 });
         renderHardGoods();
     });
 
     saveHardGoodsButton.addEventListener("click", async () => {
-        await supabase.from("hard_goods").delete().neq("id", 0);
-        const { error } = await supabase.from("hard_goods").insert(hardGoods);
+        const { error } = await supabase
+            .from("hard_goods")
+            .upsert(hardGoods, { onConflict: "id" });
         if (error) console.error(error);
         else alert("Hard Goods saved to Supabase!");
     });
@@ -149,10 +187,11 @@ document.addEventListener("DOMContentLoaded", () => {
     savePercentagesButton.addEventListener("click", async () => {
         percentages.greens = Number(greensInput.value);
         percentages.wastage = Number(wastageInput.value);
-        percentages.ccfee = Number(ccFeeInput.value);
+        percentages.ccfee = Number(ccfeeInput.value);
 
-        await supabase.from("percentages").delete().neq("id", 0);
-        const { error } = await supabase.from("percentages").insert([percentages]);
+        const { error } = await supabase
+            .from("percentages")
+            .upsert([percentages], { onConflict: "id" });
         if (error) console.error(error);
         else alert("Percentages saved to Supabase!");
     });
@@ -160,16 +199,16 @@ document.addEventListener("DOMContentLoaded", () => {
     addDesignerButton.addEventListener("click", () => {
         const name = newDesignerInput.value.trim();
         if (name) {
-            designers.push(name);
+            designers.push({ id: uuidv4(), name });
             newDesignerInput.value = "";
             renderDesigners();
         }
     });
 
     saveDesignersButton.addEventListener("click", async () => {
-        await supabase.from("designers").delete().neq("id", 0);
-        const insertData = designers.map(name => ({ name }));
-        const { error } = await supabase.from("designers").insert(insertData);
+        const { error } = await supabase
+            .from("designers")
+            .upsert(designers, { onConflict: "id" });
         if (error) console.error(error);
         else alert("Designers saved to Supabase!");
     });
@@ -183,15 +222,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
         flowers = flowerData || [];
         hardGoods = hardGoodData || [];
-        designers = designerData?.map(d => d.name) || [];
-        percentages = percData?.[0] || { greens: 0, wastage: 0, ccfee: 0 };
+        designers = designerData || [];
+        percentages = percData?.[0] || { id: uuidv4(), greens: 0, wastage: 0, ccfee: 0 };
 
         renderFlowers();
         renderHardGoods();
         renderDesigners();
         greensInput.value = percentages.greens?.toFixed(2) || "0.00";
         wastageInput.value = percentages.wastage?.toFixed(2) || "0.00";
-        ccFeeInput.value = percentages.ccfee?.toFixed(2) || "0.00";
+        ccfeeInput.value = percentages.ccfee?.toFixed(2) || "0.00";
     }
 
     // ----- Initialize -----
