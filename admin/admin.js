@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const greensInput = document.getElementById("greensPercent");
     const wastageInput = document.getElementById("wastagePercent");
-    const ccFeeInput = document.getElementById("ccFeePercent");
+    const ccFeeInput = document.getElementById("ccfeePercent");
 
     // ----- Render Functions -----
     function renderFlowers() {
@@ -149,7 +149,7 @@ document.addEventListener("DOMContentLoaded", () => {
     savePercentagesButton.addEventListener("click", async () => {
         percentages.greens = Number(greensInput.value);
         percentages.wastage = Number(wastageInput.value);
-        percentages.ccFee = Number(ccFeeInput.value);
+        percentages.ccfee = Number(ccFeeInput.value);
 
         await supabase.from("percentages").delete().neq("id", 0);
         const { error } = await supabase.from("percentages").insert([percentages]);
@@ -184,14 +184,14 @@ document.addEventListener("DOMContentLoaded", () => {
         flowers = flowerData || [];
         hardGoods = hardGoodData || [];
         designers = designerData?.map(d => d.name) || [];
-        percentages = percData?.[0] || { greens: 0, wastage: 0, ccFee: 0 };
+        percentages = percData?.[0] || { greens: 0, wastage: 0, ccfee: 0 };
 
         renderFlowers();
         renderHardGoods();
         renderDesigners();
         greensInput.value = percentages.greens?.toFixed(2) || "0.00";
         wastageInput.value = percentages.wastage?.toFixed(2) || "0.00";
-        ccFeeInput.value = percentages.ccFee?.toFixed(2) || "0.00";
+        ccFeeInput.value = percentages.ccfee?.toFixed(2) || "0.00";
     }
 
     // ----- Initialize -----
