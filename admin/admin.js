@@ -72,49 +72,70 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ----- Listeners -----
-    function addFlowerListeners() {
-        document.querySelectorAll(".flowerName").forEach(input => {
-            input.addEventListener("input", e => {
-                flowers[e.target.dataset.index].name = e.target.value;
-            });
+   function addFlowerListeners() {
+    // Name input
+    document.querySelectorAll(".flowerName").forEach(input => {
+        input.addEventListener("blur", e => {
+            const i = e.target.dataset.index;
+            flowers[i].name = e.target.value;
         });
+        input.addEventListener("keydown", e => {
+            if (e.key === "Enter") e.target.blur();
+        });
+    });
 
-        document.querySelectorAll(".flowerWholesale").forEach(input => {
-            input.addEventListener("input", e => {
-                const i = e.target.dataset.index;
-                flowers[i].wholesale = Number(e.target.value);
-                flowers[i].retail = +(flowers[i].wholesale * (1 + (flowers[i].markup || 0)/100)).toFixed(2);
-                renderFlowers();
-            });
+    // Wholesale input
+    document.querySelectorAll(".flowerWholesale").forEach(input => {
+        input.addEventListener("blur", e => {
+            const i = e.target.dataset.index;
+            flowers[i].wholesale = Number(e.target.value) || 0;
+            // recalc retail using multiplier (markup)
+            flowers[i].retail = +(flowers[i].wholesale * flowers[i].markup).toFixed(2);
+            renderFlowers();
         });
+        input.addEventListener("keydown", e => {
+            if (e.key === "Enter") e.target.blur();
+        });
+    });
 
-        document.querySelectorAll(".flowerMarkup").forEach(input => {
-            input.addEventListener("input", e => {
-                const i = e.target.dataset.index;
-                flowers[i].markup = Number(e.target.value);
-                flowers[i].retail = +(flowers[i].wholesale * (1 + flowers[i].markup/100)).toFixed(2);
-                renderFlowers();
-            });
+    // Markup input
+    document.querySelectorAll(".flowerMarkup").forEach(input => {
+        input.addEventListener("blur", e => {
+            const i = e.target.dataset.index;
+            flowers[i].markup = Number(e.target.value) || 1; // default multiplier 1
+            flowers[i].retail = +(flowers[i].wholesale * flowers[i].markup).toFixed(2);
+            renderFlowers();
         });
+        input.addEventListener("keydown", e => {
+            if (e.key === "Enter") e.target.blur();
+        });
+    });
 
-        document.querySelectorAll(".flowerRetail").forEach(input => {
-            input.addEventListener("input", e => {
-                const i = e.target.dataset.index;
-                flowers[i].retail = Number(e.target.value);
-                if(flowers[i].wholesale > 0){
-                    flowers[i].markup = +(((flowers[i].retail / flowers[i].wholesale) - 1) * 100).toFixed(2);
-                }
-                renderFlowers();
-            });
+    // Retail input
+    document.querySelectorAll(".flowerRetail").forEach(input => {
+        input.addEventListener("blur", e => {
+            const i = e.target.dataset.index;
+            flowers[i].retail = Number(e.target.value) || 0;
+            if (flowers[i].wholesale > 0) {
+                flowers[i].markup = +(flowers[i].retail / flowers[i].wholesale).toFixed(2);
+            } else {
+                flowers[i].markup = 1;
+            }
+            renderFlowers();
         });
+        input.addEventListener("keydown", e => {
+            if (e.key === "Enter") e.target.blur();
+        });
+    });
 
-        document.querySelectorAll(".removeFlower").forEach(btn => {
-            btn.addEventListener("click", e => {
-                flowers.splice(e.target.dataset.index, 1);
-                renderFlowers();
-            });
+    // Remove button
+    document.querySelectorAll(".removeFlower").forEach(btn => {
+        btn.addEventListener("click", e => {
+            flowers.splice(e.target.dataset.index, 1);
+            renderFlowers();
         });
-    }
+    });
+}
 
     function addHardGoodListeners() {
         document.querySelectorAll(".hardGoodName").forEach(input => {
