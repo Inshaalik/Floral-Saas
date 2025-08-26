@@ -6,23 +6,22 @@
     <title>Floral SaaS Admin</title>
     <link rel="stylesheet" href="css/admin.css">
 </head>
-    <nav>
-  <ul class="nav-menu">
-    <li><a href="../index.html">🏠 Home</a></li>
-    <li><a href="../flowerCalculator.html">🌼 Flower Calculator</a></li>
-    <li><a href="index.html">⚙️ Admin Dashboard</a></li>
-    <li><a href="../analytics/index.html">📊 Analytics</a></li>
-    <li><a href="../analytics/flower-usage/flower-usage.html">📈 Flower Usage</a></li>
-  </ul>
-</nav>
-
 <body>
-    <body>
-  <!-- Access restriction: owners only -->
-  <script src="../js/session.js"></script>
-  <script>
-    requireRole(['owner']); 
-  </script>
+    <!-- Access restriction: owners only -->
+    <script src="../js/session.js"></script>
+    <script>
+        requireRole(['owner']); 
+    </script>
+
+    <nav>
+        <ul class="nav-menu">
+            <li><a href="../index.html">🏠 Home</a></li>
+            <li><a href="../flowerCalculator.html">🌼 Flower Calculator</a></li>
+            <li><a href="index.html">⚙️ Admin Dashboard</a></li>
+            <li><a href="../analytics/index.html">📊 Analytics</a></li>
+            <li><a href="../analytics/flower-usage/flower-usage.html">📈 Flower Usage</a></li>
+        </ul>
+    </nav>
 
     <header>
         <h1>🌸 Floral SaaS Admin Dashboard 🌸</h1>
@@ -36,7 +35,9 @@
                 <thead>
                     <tr>
                         <th>Name</th>
-                        <th>Price per Stem ($)</th>
+                        <th>Wholesale ($)</th>
+                        <th>Markup (%)</th>
+                        <th>Retail ($)</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -68,7 +69,7 @@
             <h2>Default Percentages</h2>
             <label>Greens (%): <input type="number" id="greensPercent" value="0"></label><br>
             <label>Wastage (%): <input type="number" id="wastagePercent" value="0"></label><br>
-            <label>CC Fee (%): <input type="number" id="ccFeePercent" value="0"></label><br>
+            <label>CC Fee (%): <input type="number" id="ccfeePercent" value="0"></label><br>
             <button id="savePercentages">Save Percentages</button>
         </section>
 
@@ -90,10 +91,9 @@
         </section>
     </main>
 
- <!-- Load shared data first -->
-<script src="../js/sharedData.js"></script>
-<!-- Then load admin logic -->
-<script src="admin.js"></script>
-
+    <!-- Load shared data first -->
+    <script src="../js/sharedData.js"></script>
+    <!-- Then load admin logic -->
+    <script type="module" src="admin.js"></script>
 </body>
 </html>
