@@ -1,4 +1,6 @@
 // admin/admin.js
+import { supabase } from "../js/supabaseClient.js";
+
 document.addEventListener("DOMContentLoaded", () => {
     // ----- Load shared data -----
     loadSharedData();
