@@ -29,21 +29,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // ----- Render Functions -----
     function renderFlowers() {
-    flowersTable.innerHTML = "";
-    flowers.forEach((flower, i) => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-            <td><input type="text" data-index="${i}" class="flowerName" value="${flower.name}"></td>
-            <td><input type="number" step="0.01" data-index="${i}" class="flowerWholesale" value="${flower.wholesale || 0}"></td>
-            <td><input type="number" step="0.01" data-index="${i}" class="flowerMarkup" value="${flower.markup || 0}"></td>
-            <td><input type="number" step="0.01" data-index="${i}" class="flowerRetail" value="${flower.retail || 0}"></td>
-            <td><button data-index="${i}" class="removeFlower">Remove</button></td>
-        `;
-        flowersTable.appendChild(row);
-    });
-    addFlowerListeners();
-}
-
+        flowersTable.innerHTML = "";
+        flowers.forEach((flower, i) => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td><input type="text" data-index="${i}" class="flowerName" value="${flower.name}"></td>
+                <td><input type="number" step="0.01" data-index="${i}" class="flowerWholesale" value="${flower.wholesale || 0}"></td>
+                <td><input type="number" step="0.01" data-index="${i}" class="flowerMarkup" value="${flower.markup || 0}"></td>
+                <td><input type="number" step="0.01" data-index="${i}" class="flowerRetail" value="${flower.retail || 0}"></td>
+                <td><button data-index="${i}" class="removeFlower">Remove</button></td>
+            `;
+            flowersTable.appendChild(row);
+        });
+        addFlowerListeners();
+    }
 
     function renderHardGoods() {
         hardGoodsTable.innerHTML = "";
@@ -74,55 +73,48 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // ----- Listeners -----
     function addFlowerListeners() {
-    document.querySelectorAll(".flowerName").forEach(input => {
-        input.addEventListener("input", e => {
-            flowers[e.target.dataset.index].name = e.target.value;
+        document.querySelectorAll(".flowerName").forEach(input => {
+            input.addEventListener("input", e => {
+                flowers[e.target.dataset.index].name = e.target.value;
+            });
         });
-    });
 
-    // Wholesale input
-    document.querySelectorAll(".flowerWholesale").forEach(input => {
-        input.addEventListener("input", e => {
-            const i = e.target.dataset.index;
-            flowers[i].wholesale = Number(e.target.value);
-            // recalc retail
-            flowers[i].retail = +(flowers[i].wholesale * (1 + (flowers[i].markup || 0)/100)).toFixed(2);
-            renderFlowers();
+        document.querySelectorAll(".flowerWholesale").forEach(input => {
+            input.addEventListener("input", e => {
+                const i = e.target.dataset.index;
+                flowers[i].wholesale = Number(e.target.value);
+                flowers[i].retail = +(flowers[i].wholesale * (1 + (flowers[i].markup || 0)/100)).toFixed(2);
+                renderFlowers();
+            });
         });
-    });
 
-    // Markup input
-    document.querySelectorAll(".flowerMarkup").forEach(input => {
-        input.addEventListener("input", e => {
-            const i = e.target.dataset.index;
-            flowers[i].markup = Number(e.target.value);
-            // recalc retail
-            flowers[i].retail = +(flowers[i].wholesale * (1 + flowers[i].markup/100)).toFixed(2);
-            renderFlowers();
+        document.querySelectorAll(".flowerMarkup").forEach(input => {
+            input.addEventListener("input", e => {
+                const i = e.target.dataset.index;
+                flowers[i].markup = Number(e.target.value);
+                flowers[i].retail = +(flowers[i].wholesale * (1 + flowers[i].markup/100)).toFixed(2);
+                renderFlowers();
+            });
         });
-    });
 
-    // Retail input
-    document.querySelectorAll(".flowerRetail").forEach(input => {
-        input.addEventListener("input", e => {
-            const i = e.target.dataset.index;
-            flowers[i].retail = Number(e.target.value);
-            // recalc markup
-            if(flowers[i].wholesale > 0){
-                flowers[i].markup = +(((flowers[i].retail / flowers[i].wholesale) - 1) * 100).toFixed(2);
-            }
-            renderFlowers();
+        document.querySelectorAll(".flowerRetail").forEach(input => {
+            input.addEventListener("input", e => {
+                const i = e.target.dataset.index;
+                flowers[i].retail = Number(e.target.value);
+                if(flowers[i].wholesale > 0){
+                    flowers[i].markup = +(((flowers[i].retail / flowers[i].wholesale) - 1) * 100).toFixed(2);
+                }
+                renderFlowers();
+            });
         });
-    });
 
-    document.querySelectorAll(".removeFlower").forEach(btn => {
-        btn.addEventListener("click", e => {
-            flowers.splice(e.target.dataset.index, 1);
-            renderFlowers();
+        document.querySelectorAll(".removeFlower").forEach(btn => {
+            btn.addEventListener("click", e => {
+                flowers.splice(e.target.dataset.index, 1);
+                renderFlowers();
+            });
         });
-    });
-}
-
+    }
 
     function addHardGoodListeners() {
         document.querySelectorAll(".hardGoodName").forEach(input => {
@@ -158,10 +150,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ----- Button Events -----
-   addFlowerButton.addEventListener("click", () => {
-    flowers.push({ name: "", wholesale: 0, markup: 0, retail: 0 });
-    renderFlowers();
-});
+    addFlowerButton.addEventListener("click", () => {
+        flowers.push({ id: uuidv4(), name: "", wholesale: 0, markup: 0, retail: 0 });
+        renderFlowers();
+    });
 
     saveFlowersButton.addEventListener("click", async () => {
         const { error } = await supabase
@@ -185,9 +177,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     savePercentagesButton.addEventListener("click", async () => {
-        percentages.greens = Number(greensInput.value);
-        percentages.wastage = Number(wastageInput.value);
-        percentages.ccfee = Number(ccfeeInput.value);
+        percentages.greens = parseFloat(greensInput.value) || 0;
+        percentages.wastage = parseFloat(wastageInput.value) || 0;
+        percentages.ccfee = parseFloat(ccfeeInput.value) || 0;
 
         const { error } = await supabase
             .from("percentages")
@@ -228,9 +220,9 @@ document.addEventListener("DOMContentLoaded", () => {
         renderFlowers();
         renderHardGoods();
         renderDesigners();
-        greensInput.value = percentages.greens?.toFixed(2) || "0.00";
-        wastageInput.value = percentages.wastage?.toFixed(2) || "0.00";
-        ccfeeInput.value = percentages.ccfee?.toFixed(2) || "0.00";
+        greensInput.value = parseFloat(percentages.greens || 0).toFixed(2);
+        wastageInput.value = parseFloat(percentages.wastage || 0).toFixed(2);
+        ccfeeInput.value = parseFloat(percentages.ccfee || 0).toFixed(2);
     }
 
     // ----- Initialize -----
