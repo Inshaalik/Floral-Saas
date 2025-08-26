@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // ----- Load shared data initially -----
     loadSharedData();
 
-    let flowersData = masterFlowers || [];
+    let flowersData = masterFlowers || [];      // From admin table
     let hardGoodsData = masterHardGoods || [];
     let percentagesData = masterPercentages || { greens: 0, wastage: 0, ccFee: 0 };
     let designersData = masterDesigners || [];
@@ -22,33 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const ccFeeInput = document.getElementById("ccFee");
     const flowerTotalOutput = document.getElementById("flowerTotal");
     const remainingOutput = document.getElementById("remaining");
-
     const saveRecipeButton = document.getElementById("saveRecipeButton");
-
-saveRecipeButton.addEventListener("click", () => {
-    if (!recipeNameInput.value || !designerSelect.value) {
-        alert("Please enter a recipe name and select a designer.");
-        return;
-    }
-
-    const recipe = {
-        date: new Date().toISOString().split("T")[0], // YYYY-MM-DD
-        name: recipeNameInput.value,
-        designer: designerSelect.value,
-        flowers: flowers.map(f => ({ name: f.name, quantity: f.quantity, price: f.price })),
-        hardGoods: selectedHardGood.name ? [{ name: selectedHardGood.name, price: selectedHardGood.price }] : [],
-        percentages: {
-            greens: Number(greensInput.value),
-            wastage: Number(wastageInput.value),
-            ccFee: Number(ccFeeInput.value)
-        }
-    };
-
-    saveRecipe(recipe);
-
-    alert("Recipe saved!");
-});
-
 
     // ----- State -----
     let flowers = [];
@@ -78,17 +52,19 @@ saveRecipeButton.addEventListener("click", () => {
     }
 
     function addFlowerListeners() {
+        // When flower is selected, pull retail price
         document.querySelectorAll(".flowerSelect").forEach(select => {
             select.addEventListener("change", e => {
                 const i = e.target.dataset.index;
                 const flowerName = e.target.value;
                 const master = flowersData.find(f => f.name === flowerName);
                 flowers[i].name = flowerName;
-                flowers[i].price = master ? master.price : 0;
+                flowers[i].price = master ? master.retail : 0; // <-- use retail
                 renderFlowers();
             });
         });
 
+        // Update quantity
         document.querySelectorAll(".quantityInput").forEach(input => {
             input.addEventListener("input", e => {
                 const i = e.target.dataset.index;
@@ -97,6 +73,7 @@ saveRecipeButton.addEventListener("click", () => {
             });
         });
 
+        // Remove flower
         document.querySelectorAll(".removeButton").forEach(button => {
             button.addEventListener("click", e => {
                 const i = e.target.dataset.index;
@@ -118,7 +95,7 @@ saveRecipeButton.addEventListener("click", () => {
 
     function renderDesigners() {
         designerSelect.innerHTML = '<option value="">--Select Designer--</option>';
-        (designersData || []).forEach(d => {
+        designersData.forEach(d => {
             const option = document.createElement("option");
             option.value = d;
             option.textContent = d;
@@ -126,6 +103,7 @@ saveRecipeButton.addEventListener("click", () => {
         });
     }
 
+    // ----- Update Totals -----
     function updateTotals() {
         const flowerTotal = flowers.reduce((sum, f) => sum + (f.price * (f.quantity || 0)), 0);
         flowerTotalOutput.textContent = flowerTotal.toFixed(2);
@@ -158,6 +136,29 @@ saveRecipeButton.addEventListener("click", () => {
     });
 
     [customerPriceInput].forEach(input => input.addEventListener("input", updateTotals));
+
+    saveRecipeButton.addEventListener("click", () => {
+        if (!recipeNameInput.value || !designerSelect.value) {
+            alert("Please enter a recipe name and select a designer.");
+            return;
+        }
+
+        const recipe = {
+            date: new Date().toISOString().split("T")[0],
+            name: recipeNameInput.value,
+            designer: designerSelect.value,
+            flowers: flowers.map(f => ({ name: f.name, quantity: f.quantity, price: f.price })),
+            hardGoods: selectedHardGood.name ? [{ name: selectedHardGood.name, price: selectedHardGood.price }] : [],
+            percentages: {
+                greens: Number(greensInput.value),
+                wastage: Number(wastageInput.value),
+                ccFee: Number(ccFeeInput.value)
+            }
+        };
+
+        saveRecipe(recipe);
+        alert("Recipe saved!");
+    });
 
     // ----- Initialize -----
     flowers.push({ name: "", quantity: 0, price: 0 });
