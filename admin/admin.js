@@ -2,14 +2,11 @@
 import { supabase } from "../js/supabaseClient.js";
 
 document.addEventListener("DOMContentLoaded", () => {
-    // ----- Load shared data -----
-    loadSharedData();
-
     // ----- Local copies of master data -----
-    let flowers = [...window.masterFlowers];
-    let hardGoods = [...window.masterHardGoods];
-    let designers = [...window.masterDesigners];
-    let percentages = { ...window.masterPercentages };
+    let flowers = [];
+    let hardGoods = [];
+    let designers = [];
+    let percentages = { greens: 0, wastage: 0, ccFee: 0 };
 
     // ----- DOM Elements -----
     const flowersTable = document.querySelector("#flowersTable tbody");
@@ -130,10 +127,11 @@ document.addEventListener("DOMContentLoaded", () => {
         renderFlowers();
     });
 
-    saveFlowersButton.addEventListener("click", () => {
-        window.masterFlowers = [...flowers];
-        localStorage.setItem("masterFlowers", JSON.stringify(window.masterFlowers));
-        alert("Flowers saved!");
+    saveFlowersButton.addEventListener("click", async () => {
+        await supabase.from("flowers").delete().neq("id", 0);
+        const { error } = await supabase.from("flowers").insert(flowers);
+        if (error) console.error(error);
+        else alert("Flowers saved to Supabase!");
     });
 
     addHardGoodButton.addEventListener("click", () => {
@@ -141,19 +139,22 @@ document.addEventListener("DOMContentLoaded", () => {
         renderHardGoods();
     });
 
-    saveHardGoodsButton.addEventListener("click", () => {
-        window.masterHardGoods = [...hardGoods];
-        localStorage.setItem("masterHardGoods", JSON.stringify(window.masterHardGoods));
-        alert("Hard Goods saved!");
+    saveHardGoodsButton.addEventListener("click", async () => {
+        await supabase.from("hard_goods").delete().neq("id", 0);
+        const { error } = await supabase.from("hard_goods").insert(hardGoods);
+        if (error) console.error(error);
+        else alert("Hard Goods saved to Supabase!");
     });
 
-    savePercentagesButton.addEventListener("click", () => {
+    savePercentagesButton.addEventListener("click", async () => {
         percentages.greens = Number(greensInput.value);
         percentages.wastage = Number(wastageInput.value);
         percentages.ccFee = Number(ccFeeInput.value);
-        window.masterPercentages = { ...percentages };
-        localStorage.setItem("masterPercentages", JSON.stringify(window.masterPercentages));
-        alert("Percentages saved!");
+
+        await supabase.from("percentages").delete().neq("id", 0);
+        const { error } = await supabase.from("percentages").insert([percentages]);
+        if (error) console.error(error);
+        else alert("Percentages saved to Supabase!");
     });
 
     addDesignerButton.addEventListener("click", () => {
@@ -165,17 +166,34 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    saveDesignersButton.addEventListener("click", () => {
-        window.masterDesigners = [...designers];
-        localStorage.setItem("masterDesigners", JSON.stringify(window.masterDesigners));
-        alert("Designers saved!");
+    saveDesignersButton.addEventListener("click", async () => {
+        await supabase.from("designers").delete().neq("id", 0);
+        const insertData = designers.map(name => ({ name }));
+        const { error } = await supabase.from("designers").insert(insertData);
+        if (error) console.error(error);
+        else alert("Designers saved to Supabase!");
     });
 
+    // ----- Load Data from Supabase -----
+    async function loadFromSupabase() {
+        const { data: flowerData } = await supabase.from("flowers").select("*");
+        const { data: hardGoodData } = await supabase.from("hard_goods").select("*");
+        const { data: designerData } = await supabase.from("designers").select("*");
+        const { data: percData } = await supabase.from("percentages").select("*");
+
+        flowers = flowerData || [];
+        hardGoods = hardGoodData || [];
+        designers = designerData?.map(d => d.name) || [];
+        percentages = percData?.[0] || { greens: 0, wastage: 0, ccFee: 0 };
+
+        renderFlowers();
+        renderHardGoods();
+        renderDesigners();
+        greensInput.value = percentages.greens?.toFixed(2) || "0.00";
+        wastageInput.value = percentages.wastage?.toFixed(2) || "0.00";
+        ccFeeInput.value = percentages.ccFee?.toFixed(2) || "0.00";
+    }
+
     // ----- Initialize -----
-    renderFlowers();
-    renderHardGoods();
-    renderDesigners();
-    greensInput.value = percentages.greens.toFixed(2);
-    wastageInput.value = percentages.wastage.toFixed(2);
-    ccFeeInput.value = percentages.ccFee.toFixed(2);
+    loadFromSupabase();
 });
