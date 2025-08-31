@@ -47,7 +47,7 @@ async function loadSharedData() {
         window.masterFlowers = JSON.parse(localStorage.getItem("masterFlowers")) || [];
         window.masterHardGoods = JSON.parse(localStorage.getItem("masterHardGoods")) || [];
         window.masterDesigners = JSON.parse(localStorage.getItem("masterDesigners")) || [];
-        window.masterPercentages = JSON.parse(localStorage.getItem("masterPercentages")) || { greens: 0, wastage: 0, ccFee: 0 };
+        window.masterPercentages = JSON.parse(localStorage.getItem("masterPercentages")) || { greens: 0, wastage: 0, ccfee: 0 };
     }
 }
 

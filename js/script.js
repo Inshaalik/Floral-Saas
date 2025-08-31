@@ -1,11 +1,13 @@
 // ----- Main Calculator -----
 // Pulls live data from sharedData.js
 
-document.addEventListener("DOMContentLoaded", () => {
-    // ----- Load shared data initially -----
-    loadSharedData();
 
-    let flowersData = masterFlowers || [];      // From admin table
+ document.addEventListener("DOMContentLoaded", async () => {  // <-- added 'async' here
+    // ----- Load shared data initially -----
+    await loadSharedData();                                  // <-- added 'await' here
+
+    // ----- Initialize arrays AFTER data has loaded -----
+    let flowersData = masterFlowers || [];                  // From admin table
     let hardGoodsData = masterHardGoods || [];
     let percentagesData = masterPercentages || { greens: 0, wastage: 0, ccfee: 0 };
     let designersData = masterDesigners || [];
@@ -165,8 +167,9 @@ document.addEventListener("DOMContentLoaded", () => {
     updateTotals();
 
     // ----- Live updates from Admin -----
-    window.addEventListener("sharedDataChanged", () => {
-        loadSharedData();
+    window.addEventListener("sharedDataChanged", async () => {
+       await loadSharedData();
+       
         flowersData = masterFlowers || [];
         hardGoodsData = masterHardGoods || [];
         percentagesData = masterPercentages || { greens: 0, wastage: 0, ccfee: 0 };
