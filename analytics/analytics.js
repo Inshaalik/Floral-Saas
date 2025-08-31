@@ -1,23 +1,55 @@
-// Load shared data
-loadSharedData();
+import { supabase } from './supabaseClient.js';
 
-// Grab the table body
+// ----- DOM Elements -----
 const tableBody = document.querySelector("#analyticsTable tbody");
-
-// Filters
 const designerFilter = document.getElementById("designerFilter");
 const flowerFilter = document.getElementById("flowerFilter");
 const dateFromInput = document.getElementById("dateFrom");
 const dateToInput = document.getElementById("dateTo");
 const applyFiltersBtn = document.getElementById("applyFilters");
+const sortSelect = document.getElementById("sortSelect"); // optional dropdown for sort options
 
-// Example: Assuming savedRecipes is an array in sharedData
-// Each recipe: { date, name, designer, flowers: [{name, qty, price}], hardGoods: [{name, price}], percentages: {...} }
-let recipesData = window.masterRecipes || [];  // We'll add saving to masterRecipes later
+let recipesData = [];
 
-// Populate filter dropdowns
+// ----- Load Recipes from Supabase -----
+async function loadRecipes() {
+    try {
+        const { data, error } = await supabase
+            .from('recipes')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        // Parse description JSON into usable objects
+        recipesData = data.map(r => {
+            let desc = {};
+            try { desc = JSON.parse(r.description || '{}'); } catch (e) { console.error(e); }
+
+            return {
+                id: r.id,
+                date: new Date(r.created_at).toISOString().split("T")[0],
+                name: r.name,
+                designer: desc.designer || "",
+                flowers: desc.flowers || [],
+                hardGoods: desc.hardGoods || [],
+                percentages: desc.percentages || { greens: 0, wastage: 0, ccFee: 0 }
+            };
+        });
+
+        populateFilters();
+        renderTable(recipesData);
+    } catch (err) {
+        console.error("Error loading recipes from Supabase:", err);
+    }
+}
+
+// ----- Populate Filter Dropdowns -----
 function populateFilters() {
-    const designers = [...new Set(recipesData.map(r => r.designer))];
+    designerFilter.innerHTML = '<option value="">--All Designers--</option>';
+    flowerFilter.innerHTML = '<option value="">--All Flowers--</option>';
+
+    const designers = [...new Set(recipesData.map(r => r.designer))].sort();
     designers.forEach(d => {
         const option = document.createElement("option");
         option.value = d;
@@ -25,7 +57,7 @@ function populateFilters() {
         designerFilter.appendChild(option);
     });
 
-    const flowers = [...new Set(recipesData.flatMap(r => r.flowers.map(f => f.name)))];
+    const flowers = [...new Set(recipesData.flatMap(r => r.flowers.map(f => f.name)))].sort();
     flowers.forEach(f => {
         const option = document.createElement("option");
         option.value = f;
@@ -34,15 +66,17 @@ function populateFilters() {
     });
 }
 
-// Render table
+// ----- Render Table -----
 function renderTable(data) {
     tableBody.innerHTML = "";
-    data.forEach((r, i) => {
+
+    data.forEach(r => {
         const flowerNames = r.flowers.map(f => `${f.name} (${f.quantity})`).join(", ");
-        const hardGoodsNames = r.hardGoods.map(h => `${h.name}`).join(", ");
-        const totalCost = r.flowers.reduce((sum,f)=>sum+f.price*f.quantity,0)
-                       + r.hardGoods.reduce((sum,h)=>sum+h.price,0)
-                       + r.percentages.greens + r.percentages.wastage + r.percentages.ccFee;
+        const hardGoodsNames = r.hardGoods.map(h => h.name).join(", ");
+        const flowerTotal = r.flowers.reduce((sum,f)=>sum + f.price*f.quantity,0);
+        const hardGoodsTotal = r.hardGoods.reduce((sum,h)=>sum + h.price,0);
+        const totalCost = flowerTotal + hardGoodsTotal + r.percentages.greens + r.percentages.wastage + r.percentages.ccFee;
+
         const row = document.createElement("tr");
         row.innerHTML = `
             <td>${r.date}</td>
@@ -54,37 +88,83 @@ function renderTable(data) {
             <td>${r.percentages.wastage.toFixed(2)}</td>
             <td>${r.percentages.ccFee.toFixed(2)}</td>
             <td>${totalCost.toFixed(2)}</td>
-            <td><button class="deleteRecipe" data-index="${i}">Delete</button></td>
-
+            <td><button class="deleteRecipe" data-id="${r.id}">Delete</button></td>
         `;
         tableBody.appendChild(row);
     });
-    // Attach delete handlers
+
+    attachDeleteHandlers();
+}
+
+// ----- Delete Recipe -----
+function attachDeleteHandlers() {
     document.querySelectorAll(".deleteRecipe").forEach(btn => {
-        btn.addEventListener("click", e => {
-            const i = e.target.dataset.index;
-            window.masterRecipes.splice(i, 1); // remove recipe
-            localStorage.setItem("masterRecipes", JSON.stringify(window.masterRecipes));
-            loadSharedData();           // reload shared data
-            renderTable(window.masterRecipes); // refresh table
+        btn.addEventListener("click", async e => {
+            const id = e.target.dataset.id;
+            if (!confirm("Are you sure you want to delete this recipe?")) return;
+
+            try {
+                const { error } = await supabase.from('recipes').delete().eq('id', id);
+                if (error) throw error;
+                await loadRecipes();
+            } catch (err) {
+                console.error("Error deleting recipe:", err);
+            }
         });
     });
 }
 
-// Apply filters
+// ----- Apply Filters -----
 function applyFilters() {
     let filtered = [...recipesData];
+
     if (designerFilter.value) filtered = filtered.filter(r => r.designer === designerFilter.value);
     if (flowerFilter.value) filtered = filtered.filter(r => r.flowers.some(f => f.name === flowerFilter.value));
     if (dateFromInput.value) filtered = filtered.filter(r => r.date >= dateFromInput.value);
     if (dateToInput.value) filtered = filtered.filter(r => r.date <= dateToInput.value);
 
+    applySort(filtered);
     renderTable(filtered);
 }
 
-// Initialize
-populateFilters();
-renderTable(recipesData);
+// ----- Sorting -----
+function applySort(data) {
+    const sortVal = sortSelect ? sortSelect.value : "date-desc";
 
-// Event listener
+    switch(sortVal) {
+        case "name-asc":
+            data.sort((a,b) => a.name.localeCompare(b.name));
+            break;
+        case "name-desc":
+            data.sort((a,b) => b.name.localeCompare(a.name));
+            break;
+        case "cost-asc":
+            data.sort((a,b) => {
+                const totalA = a.flowers.reduce((s,f)=>s+f.price*f.quantity,0) + a.hardGoods.reduce((s,h)=>s+h.price,0);
+                const totalB = b.flowers.reduce((s,f)=>s+f.price*f.quantity,0) + b.hardGoods.reduce((s,h)=>s+h.price,0);
+                return totalA - totalB;
+            });
+            break;
+        case "cost-desc":
+            data.sort((a,b) => {
+                const totalA = a.flowers.reduce((s,f)=>s+f.price*f.quantity,0) + a.hardGoods.reduce((s,h)=>s+h.price,0);
+                const totalB = b.flowers.reduce((s,f)=>s+f.price*f.quantity,0) + b.hardGoods.reduce((s,h)=>s+h.price,0);
+                return totalB - totalA;
+            });
+            break;
+        case "date-asc":
+            data.sort((a,b) => new Date(a.date) - new Date(b.date));
+            break;
+        case "date-desc":
+        default:
+            data.sort((a,b) => new Date(b.date) - new Date(a.date));
+            break;
+    }
+}
+
+// ----- Event Listeners -----
 applyFiltersBtn.addEventListener("click", applyFilters);
+if (sortSelect) sortSelect.addEventListener("change", applyFilters);
+
+// ----- Initialize -----
+loadRecipes();

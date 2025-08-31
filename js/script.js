@@ -137,16 +137,16 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     [customerPriceInput].forEach(input => input.addEventListener("input", updateTotals));
 
-    saveRecipeButton.addEventListener("click", () => {
-        if (!recipeNameInput.value || !designerSelect.value) {
-            alert("Please enter a recipe name and select a designer.");
-            return;
-        }
+   saveRecipeButton.addEventListener("click", async () => {
+    if (!recipeNameInput.value || !designerSelect.value) {
+        alert("Please enter a recipe name and select a designer.");
+        return;
+    }
 
-        const recipe = {
-            date: new Date().toISOString().split("T")[0],
-            name: recipeNameInput.value,
-            designer: designerSelect.value,
+    const recipePayload = {
+        tenant_id: YOUR_TENANT_ID, // replace with actual tenant ID if needed
+        name: recipeNameInput.value,
+        description: JSON.stringify({
             flowers: flowers.map(f => ({ name: f.name, quantity: f.quantity, price: f.price })),
             hardGoods: selectedHardGood.name ? [{ name: selectedHardGood.name, price: selectedHardGood.price }] : [],
             percentages: {
@@ -154,11 +154,21 @@ document.addEventListener("DOMContentLoaded", async () => {
                 wastage: Number(wastageInput.value),
                 ccfee: Number(ccfeeInput.value)
             }
-        };
+        }),
+        total_stems: flowers.reduce((sum, f) => sum + (f.quantity || 0), 0)
+    };
 
-        saveRecipe(recipe);
-        alert("Recipe saved!");
-    });
+    try {
+        const { data, error } = await supabase.from('recipes').insert([recipePayload]);
+        if (error) throw error;
+
+        alert("Recipe saved to Supabase!");
+        // Optionally, reset form here or update UI
+    } catch (err) {
+        console.error("Error saving recipe:", err);
+        alert("Failed to save recipe. Check console for details.");
+    }
+});
 
     // ----- Initialize -----
     flowers.push({ name: "", quantity: 0, price: 0 });
