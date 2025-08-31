@@ -1,16 +1,17 @@
 // ----- Main Calculator -----
 // Pulls live data from sharedData.js
 
+import { loadSharedData, saveRecipe } from './sharedData.js';
 
- document.addEventListener("DOMContentLoaded", async () => {  // <-- added 'async' here
+document.addEventListener("DOMContentLoaded", async () => {
     // ----- Load shared data initially -----
-    await loadSharedData();                                  // <-- added 'await' here
+    await loadSharedData();
 
     // ----- Initialize arrays AFTER data has loaded -----
-    let flowersData = masterFlowers || [];                  // From admin table
-    let hardGoodsData = masterHardGoods || [];
-    let percentagesData = masterPercentages || { greens: 0, wastage: 0, ccfee: 0 };
-    let designersData = masterDesigners || [];
+    let flowersData = window.masterFlowers || [];
+    let hardGoodsData = window.masterHardGoods || [];
+    let percentagesData = window.masterPercentages || { greens: 0, wastage: 0, ccfee: 0 };
+    let designersData = window.masterDesigners || [];
 
     // ----- DOM Elements -----
     const recipeNameInput = document.getElementById("recipeName");
@@ -60,7 +61,7 @@
                 const flowerName = e.target.value;
                 const master = flowersData.find(f => f.name === flowerName);
                 flowers[i].name = flowerName;
-                flowers[i].price = master ? master.retail : 0; // <-- use retail
+                flowers[i].price = master ? master.retail : 0; // use retail price
                 renderFlowers();
             });
         });
@@ -169,15 +170,15 @@
     // ----- Live updates from Admin -----
     window.addEventListener("sharedDataChanged", async () => {
        await loadSharedData();
-       
-        flowersData = masterFlowers || [];
-        hardGoodsData = masterHardGoods || [];
-        percentagesData = masterPercentages || { greens: 0, wastage: 0, ccfee: 0 };
-        designersData = masterDesigners || [];
 
-        renderFlowers();
-        renderHardGoods();
-        renderDesigners();
-        updateTotals();
+       flowersData = window.masterFlowers || [];
+       hardGoodsData = window.masterHardGoods || [];
+       percentagesData = window.masterPercentages || { greens: 0, wastage: 0, ccfee: 0 };
+       designersData = window.masterDesigners || [];
+
+       renderFlowers();
+       renderHardGoods();
+       renderDesigners();
+       updateTotals();
     });
 });
