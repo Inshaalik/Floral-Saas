@@ -1,5 +1,7 @@
 // ----- Main Calculator -----
 // Pulls live data from sharedData.js
+import { supabase } from './supabaseClient.js';
+
 
 import { loadSharedData, saveRecipe } from './sharedData.js';
 
@@ -142,9 +144,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         alert("Please enter a recipe name and select a designer.");
         return;
     }
+ const tenantId = window.currentTenantId; // <-- must be set on login
 
     const recipePayload = {
-        tenant_id: YOUR_TENANT_ID, // replace with actual tenant ID if needed
+        tenant_id: tenantId, // replace with actual tenant ID if needed
         name: recipeNameInput.value,
         description: JSON.stringify({
             flowers: flowers.map(f => ({ name: f.name, quantity: f.quantity, price: f.price })),
