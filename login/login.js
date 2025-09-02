@@ -1,12 +1,50 @@
 import { supabase } from '../js/supabaseClient.js';
 
 const loginForm = document.getElementById('loginForm');
+const emailInput = document.getElementById('email');
+const passwordInput = document.getElementById('password');
 
+// ----- Auto-redirect if already logged in -----
+async function checkSession() {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (session?.user) {
+    // Fetch membership
+    const { data: memberships, error: membershipError } = await supabase
+      .from('memberships')
+      .select('tenant_id, role')
+      .eq('user_id', session.user.id);
+
+    if (membershipError || !memberships || memberships.length === 0) {
+      console.error('Membership error:', membershipError);
+      return;
+    }
+
+    const role = memberships[0].role;
+    localStorage.setItem('tenantId', memberships[0].tenant_id);
+    localStorage.setItem('role', role);
+
+    if (role === 'owner') {
+      window.location.href = '../owner/ownerDashboard.html';
+    } else {
+      window.location.href = '../flowerCalculator.html';
+    }
+  }
+}
+
+// Run auto-redirect check immediately
+checkSession();
+
+// ----- Login Form Submit -----
 loginForm?.addEventListener('submit', async (e) => {
   e.preventDefault();
 
-  const email = document.getElementById('email').value.trim();
-  const password = document.getElementById('password').value.trim();
+  const email = emailInput.value.trim();
+  const password = passwordInput.value.trim();
+
+  if (!email || !password) {
+    alert('Please enter both email and password.');
+    return;
+  }
 
   // Supabase Auth login
   const { data, error } = await supabase.auth.signInWithPassword({ email, password });
@@ -33,10 +71,16 @@ loginForm?.addEventListener('submit', async (e) => {
     return;
   }
 
-  // Use first membership (or handle multiple if needed)
+  const role = memberships[0].role;
   localStorage.setItem('tenantId', memberships[0].tenant_id);
-  localStorage.setItem('role', memberships[0].role);
+  localStorage.setItem('role', role);
 
-  alert(`Logged in as ${email} (${memberships[0].role})`);
-  window.location.href = '../flowerCalculator.html';
+  alert(`Logged in as ${email} (${role})`);
+
+  // Redirect based on role
+  if (role === 'owner') {
+    window.location.href = '../owner/ownerDashboard.html';
+  } else {
+    window.location.href = '../flowerCalculator.html';
+  }
 });

@@ -1,0 +1,56 @@
+<!-- owner/ownerDashboard.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Owner Dashboard</title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Owner Dashboard</h1>
+        <nav>
+            <button id="homeBtn">Home</button>
+            <button id="navAdminBtn">Admin Dashboard</button>
+            <button id="navCalculatorBtn">Flower Calculator</button>
+            <button id="navAnalyticsBtn">Analytics</button>
+            <button id="logoutBtn">Logout</button>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Invite Sub-User Section -->
+        <section id="inviteSubUserSection">
+            <h2>Invite Sub-User</h2>
+            <input type="email" id="inviteEmail" placeholder="Sub-user email">
+            <button id="inviteButton">Invite</button>
+        </section>
+
+        <!-- Sub-User List Section -->
+        <section id="subUserListSection">
+            <h2>Sub-Users</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="subUserList">
+                    <!-- Populated by ownerDashboard.js -->
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Owner Settings Section -->
+        <section id="settingsSection">
+            <h2>Owner Settings</h2>
+            <p>Here we can later add payment info, tier level, and other shop settings.</p>
+        </section>
+    </main>
+
+    <script type="module" src="./ownerDashboard.js"></script>
+</body>
+</html>
