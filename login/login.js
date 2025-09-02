@@ -41,7 +41,7 @@ async function checkSession() {
 }
 
 // Run auto-redirect on page load
-checkSession();
+//checkSession();
 
 // ----- Login Form Submit -----
 loginForm?.addEventListener('submit', async (e) => {
