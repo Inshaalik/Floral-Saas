@@ -3,15 +3,67 @@
 <head>
   <meta charset="UTF-8">
   <title>Sign Up</title>
+  <style>
+    #inviteMessage {
+      margin-bottom: 1em;
+      padding: 0.75em;
+      border-radius: 8px;
+      background: #f0f9ff;
+      color: #0369a1;
+      font-family: sans-serif;
+      display: none;
+    }
+  </style>
 </head>
 <body>
+  <!-- Invite confirmation -->
+  <div id="inviteMessage"></div>
+
   <form id="signupForm">
     <input type="text" id="fullName" placeholder="Full Name" required />
     <input type="email" id="email" placeholder="Email" required />
     <input type="password" id="password" placeholder="Password" required />
-    <input type="text" id="shopName" placeholder="Shop Name (for owners)" required />
+    
+    <!-- Shop Name only for owners -->
+    <div id="shopNameWrapper">
+      <input type="text" id="shopName" placeholder="Shop Name (for owners)" required />
+    </div>
+
     <button type="submit">Sign Up</button>
   </form>
+
+  <script type="module">
+    import { supabase } from '../js/supabaseClient.js';
+
+    const params = new URLSearchParams(window.location.search);
+    const inviteToken = params.get("invite");
+
+    if (inviteToken) {
+      const shopNameInput = document.getElementById("shopName");
+      const shopNameWrapper = document.getElementById("shopNameWrapper");
+      if (shopNameInput) shopNameInput.removeAttribute("required");
+      if (shopNameWrapper) shopNameWrapper.style.display = "none";
+
+      // Fetch tenant details for this invite
+      (async () => {
+        const { data, error } = await supabase
+          .from("invites")
+          .select("tenant_id, role, tenants(name)")
+          .eq("id", inviteToken)
+          .maybeSingle();
+
+        if (!error && data) {
+          const inviteMessage = document.getElementById("inviteMessage");
+          inviteMessage.textContent = `You’re signing up to join "${data.tenants.name}" as a ${data.role}.`;
+          inviteMessage.style.display = "block";
+
+          // Store invite token for signup.js to use later
+          localStorage.setItem("inviteToken", inviteToken);
+        }
+      })();
+    }
+  </script>
+
   <script type="module" src="signup.js"></script>
 </body>
 </html>

@@ -1,8 +1,16 @@
 // ownerDashboard.js
 import { supabase } from "../js/supabaseClient.js";
-import { v4 as uuidv4 } from 'https://jspm.dev/uuid';
+import { requireRole } from "../js/session.js";
+import { v4 as uuidv4 } from "https://jspm.dev/uuid";
 
 document.addEventListener("DOMContentLoaded", async () => {
+    // 1️⃣ Require owner role immediately
+    const user = await requireRole(["owner"]);
+    let owner = user;
+    let tenant = null;
+    let subUsers = [];
+    let ownerTierLimit = 5; // default max sub-users
+
     // ----- DOM Elements -----
     const subUserTable = document.getElementById("subUserList");
     const inviteEmailInput = document.getElementById("inviteEmail");
@@ -11,11 +19,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     const navCalculatorBtn = document.getElementById("navCalculatorBtn");
     const navAnalyticsBtn = document.getElementById("navAnalyticsBtn");
     const homeBtn = document.getElementById("homeBtn");
-
-    let owner = null;
-    let tenant = null;
-    let subUsers = [];
-    let ownerTierLimit = 5; // default max sub-users
 
     // ----- Helper Functions -----
     function renderSubUsers() {
@@ -52,12 +55,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                     return;
                 }
 
-                // Optionally, delete profile if needed
-                // const { error: profileError } = await supabase
-                //     .from("profiles")
-                //     .delete()
-                //     .eq("id", userToRemove.id);
-
                 subUsers.splice(i, 1);
                 renderSubUsers();
                 alert("Sub-user removed.");
@@ -67,14 +64,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // ----- Load Owner, Tenant, and Sub-Users -----
     async function loadOwnerAndSubUsers() {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session?.user) {
-            window.location.href = "../login/login.html";
-            return;
-        }
-
-        owner = session.user;
-
         // 1️⃣ Fetch tenant(s) where this user is the owner
         const { data: tenantData, error: tenantError } = await supabase
             .from("tenants")
@@ -129,6 +118,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const inviteCode = uuidv4();
         const { error } = await supabase.from("subuser_invites").insert([{
             owner_id: owner.id,
+            tenant_id: tenant.id,
             email,
             code: inviteCode,
             created_at: new Date()

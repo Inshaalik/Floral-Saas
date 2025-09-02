@@ -8,7 +8,11 @@ signupForm?.addEventListener('submit', async (e) => {
   const fullName = document.getElementById('fullName').value.trim();
   const email = document.getElementById('email').value.trim();
   const password = document.getElementById('password').value.trim();
-  const shopName = document.getElementById('shopName').value.trim();
+  const shopName = document.getElementById('shopName')?.value.trim(); // shopName only for owners
+
+  // check invite from URL
+  const params = new URLSearchParams(window.location.search);
+  const inviteCode = params.get('invite');
 
   try {
     // 1️⃣ Sign up user
@@ -29,32 +33,61 @@ signupForm?.addEventListener('submit', async (e) => {
     }]);
     if (profileError) throw profileError;
 
-    // 4️⃣ Create tenant with owner_id
-    const { data: tenantData, error: tenantError } = await supabase
-      .from('tenants')
-      .insert([{
-        name: shopName,
-        slug: shopName.toLowerCase().replace(/\s+/g, '-'),
-        owner_id: userId
-      }])
-      .select()
-      .single();
-    if (tenantError) throw tenantError;
+    if (inviteCode) {
+      // 4️⃣ Handle invited sub-user
+      const { data: inviteData, error: inviteError } = await supabase
+        .from('subuser_invites')
+        .select('*')
+        .eq('code', inviteCode)
+        .single();
 
-    // 5️⃣ Create membership
-    const { error: membershipError } = await supabase.from('memberships').insert([{
-      tenant_id: tenantData.id,
-      user_id: userId,
-      role: 'owner'
-    }]);
-    if (membershipError) throw membershipError;
+      if (inviteError || !inviteData) {
+        throw new Error("Invalid or expired invite link.");
+      }
 
-    // 6️⃣ Store tenantId and redirect
-    localStorage.setItem('tenantId', tenantData.id);
-    alert('Sign up successful! You are now the owner of your shop.');
-    window.location.href = '../flowerCalculator.html';
+      // Create membership for this tenant
+      const { error: membershipError } = await supabase.from('memberships').insert([{
+        tenant_id: inviteData.tenant_id,
+        user_id: userId,
+        role: 'user' // default sub-user role
+      }]);
+      if (membershipError) throw membershipError;
+
+      // delete invite so it can’t be reused
+      await supabase.from('subuser_invites').delete().eq('id', inviteData.id);
+
+      localStorage.setItem('tenantId', inviteData.tenant_id);
+      alert("Signup successful! You've been added as a sub-user.");
+      window.location.href = '../flowerCalculator.html';
+
+    } else {
+      // 5️⃣ Owner flow (no invite)
+      const { data: tenantData, error: tenantError } = await supabase
+        .from('tenants')
+        .insert([{
+          name: shopName,
+          slug: shopName.toLowerCase().replace(/\s+/g, '-'),
+          owner_id: userId
+        }])
+        .select()
+        .single();
+      if (tenantError) throw tenantError;
+
+      // create membership for owner
+      const { error: membershipError } = await supabase.from('memberships').insert([{
+        tenant_id: tenantData.id,
+        user_id: userId,
+        role: 'owner'
+      }]);
+      if (membershipError) throw membershipError;
+
+      localStorage.setItem('tenantId', tenantData.id);
+      alert('Sign up successful! You are now the owner of your shop.');
+      window.location.href = '../flowerCalculator.html';
+    }
 
   } catch (err) {
     alert(err.message);
+    console.error(err);
   }
 });
