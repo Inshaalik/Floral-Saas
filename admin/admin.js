@@ -72,70 +72,53 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ----- Listeners -----
-   function addFlowerListeners() {
-    // Name input
-    document.querySelectorAll(".flowerName").forEach(input => {
-        input.addEventListener("blur", e => {
-            const i = e.target.dataset.index;
-            flowers[i].name = e.target.value;
+    function addFlowerListeners() {
+        document.querySelectorAll(".flowerName").forEach(input => {
+            input.addEventListener("blur", e => {
+                flowers[e.target.dataset.index].name = e.target.value;
+            });
+            input.addEventListener("keydown", e => {
+                if (e.key === "Enter") e.target.blur();
+            });
         });
-        input.addEventListener("keydown", e => {
-            if (e.key === "Enter") e.target.blur();
-        });
-    });
 
-    // Wholesale input
-    document.querySelectorAll(".flowerWholesale").forEach(input => {
-        input.addEventListener("blur", e => {
-            const i = e.target.dataset.index;
-            flowers[i].wholesale = Number(e.target.value) || 0;
-            // recalc retail using multiplier (markup)
-            flowers[i].retail = +(flowers[i].wholesale * flowers[i].markup).toFixed(2);
-            renderFlowers();
+        document.querySelectorAll(".flowerWholesale").forEach(input => {
+            input.addEventListener("blur", e => {
+                const i = e.target.dataset.index;
+                flowers[i].wholesale = Number(e.target.value) || 0;
+                flowers[i].retail = +(flowers[i].wholesale * flowers[i].markup).toFixed(2);
+                renderFlowers();
+            });
+            input.addEventListener("keydown", e => { if (e.key === "Enter") e.target.blur(); });
         });
-        input.addEventListener("keydown", e => {
-            if (e.key === "Enter") e.target.blur();
-        });
-    });
 
-    // Markup input
-    document.querySelectorAll(".flowerMarkup").forEach(input => {
-        input.addEventListener("blur", e => {
-            const i = e.target.dataset.index;
-            flowers[i].markup = Number(e.target.value) || 1; // default multiplier 1
-            flowers[i].retail = +(flowers[i].wholesale * flowers[i].markup).toFixed(2);
-            renderFlowers();
+        document.querySelectorAll(".flowerMarkup").forEach(input => {
+            input.addEventListener("blur", e => {
+                const i = e.target.dataset.index;
+                flowers[i].markup = Number(e.target.value) || 1;
+                flowers[i].retail = +(flowers[i].wholesale * flowers[i].markup).toFixed(2);
+                renderFlowers();
+            });
+            input.addEventListener("keydown", e => { if (e.key === "Enter") e.target.blur(); });
         });
-        input.addEventListener("keydown", e => {
-            if (e.key === "Enter") e.target.blur();
-        });
-    });
 
-    // Retail input
-    document.querySelectorAll(".flowerRetail").forEach(input => {
-        input.addEventListener("blur", e => {
-            const i = e.target.dataset.index;
-            flowers[i].retail = Number(e.target.value) || 0;
-            if (flowers[i].wholesale > 0) {
-                flowers[i].markup = +(flowers[i].retail / flowers[i].wholesale).toFixed(2);
-            } else {
-                flowers[i].markup = 1;
-            }
-            renderFlowers();
+        document.querySelectorAll(".flowerRetail").forEach(input => {
+            input.addEventListener("blur", e => {
+                const i = e.target.dataset.index;
+                flowers[i].retail = Number(e.target.value) || 0;
+                flowers[i].markup = flowers[i].wholesale > 0 ? +(flowers[i].retail / flowers[i].wholesale).toFixed(2) : 1;
+                renderFlowers();
+            });
+            input.addEventListener("keydown", e => { if (e.key === "Enter") e.target.blur(); });
         });
-        input.addEventListener("keydown", e => {
-            if (e.key === "Enter") e.target.blur();
-        });
-    });
 
-    // Remove button
-    document.querySelectorAll(".removeFlower").forEach(btn => {
-        btn.addEventListener("click", e => {
-            flowers.splice(e.target.dataset.index, 1);
-            renderFlowers();
+        document.querySelectorAll(".removeFlower").forEach(btn => {
+            btn.addEventListener("click", e => {
+                flowers.splice(e.target.dataset.index, 1);
+                renderFlowers();
+            });
         });
-    });
-}
+    }
 
     function addHardGoodListeners() {
         document.querySelectorAll(".hardGoodName").forEach(input => {
@@ -177,16 +160,21 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     saveFlowersButton.addEventListener("click", async () => {
-         const tenantId = localStorage.getItem('tenantId');
-    const flowersWithTenant = flowers.map(flower => ({
-        ...flower,
-        tenant_id: tenantId
-    }));
-        const { error } = await supabase
-            .from("flowers")
-            .upsert(flowersWithTenant, { onConflict: "id" });
-        if (error) console.error(error);
-        else alert("Flowers saved to Supabase!");
+        const tenantId = localStorage.getItem('tenantId');
+        const flowersWithTenant = flowers.map(f => ({ ...f, tenant_id: tenantId }));
+        const { error } = await supabase.from("flowers")
+            .upsert(flowersWithTenant, { onConflict: ["tenant_id", "name"] });
+
+        if (error) {
+            console.error(error);
+            alert("Error saving flowers: " + error.message);
+            return;
+        }
+
+        const { data } = await supabase.from("flowers").select("*").eq("tenant_id", tenantId);
+        flowers = data || [];
+        renderFlowers();
+        alert("Flowers saved to Supabase!");
     });
 
     addHardGoodButton.addEventListener("click", () => {
@@ -196,61 +184,79 @@ document.addEventListener("DOMContentLoaded", () => {
 
     saveHardGoodsButton.addEventListener("click", async () => {
         const tenantId = localStorage.getItem('tenantId');
-    const hardGoodsWithTenant = hardGoods.map(item => ({
-        ...item,
-        tenant_id: tenantId
-    }));
-        const { error } = await supabase
-            .from("hard_goods")
-            .upsert(hardGoodsWithTenant, { onConflict: "id" });
-        if (error) console.error(error);
-        else alert("Hard Goods saved to Supabase!");
+        const hardGoodsWithTenant = hardGoods.map(h => ({ ...h, tenant_id: tenantId }));
+        const { error } = await supabase.from("hard_goods")
+            .upsert(hardGoodsWithTenant, { onConflict: ["tenant_id", "name"] });
+
+        if (error) {
+            console.error(error);
+            alert("Error saving hard goods: " + error.message);
+            return;
+        }
+
+        const { data } = await supabase.from("hard_goods").select("*").eq("tenant_id", tenantId);
+        hardGoods = data || [];
+        renderHardGoods();
+        alert("Hard Goods saved to Supabase!");
     });
 
     savePercentagesButton.addEventListener("click", async () => {
         const tenantId = localStorage.getItem('tenantId');
-    percentages.tenant_id = tenantId;
+        percentages = {
+            ...percentages,
+            tenant_id: tenantId,
+            greens: parseFloat(greensInput.value) || 0,
+            wastage: parseFloat(wastageInput.value) || 0,
+            ccfee: parseFloat(ccfeeInput.value) || 0
+        };
 
-        percentages.greens = parseFloat(greensInput.value) || 0;
-        percentages.wastage = parseFloat(wastageInput.value) || 0;
-        percentages.ccfee = parseFloat(ccfeeInput.value) || 0;
-
-        const { error } = await supabase
-            .from("percentages")
+        const { error } = await supabase.from("percentages")
             .upsert([percentages], { onConflict: "id" });
-        if (error) console.error(error);
-        else alert("Percentages saved to Supabase!");
+
+        if (error) {
+            console.error(error);
+            alert("Error saving percentages: " + error.message);
+            return;
+        }
+
+        alert("Percentages saved to Supabase!");
     });
 
     addDesignerButton.addEventListener("click", () => {
         const name = newDesignerInput.value.trim();
-        if (name) {
-            designers.push({ id: uuidv4(), name });
-            newDesignerInput.value = "";
-            renderDesigners();
-        }
+        if (!name) return;
+        designers.push({ id: uuidv4(), name });
+        newDesignerInput.value = "";
+        renderDesigners();
     });
 
     saveDesignersButton.addEventListener("click", async () => {
-         const tenantId = localStorage.getItem('tenantId');
-    const designersWithTenant = designers.map(designer => ({
-        ...designer,
-        tenant_id: tenantId
-    }));
-        const { error } = await supabase
-            .from("designers")
-            .upsert(designersWithTenant, { onConflict: "id" });
-        if (error) console.error(error);
-        else alert("Designers saved to Supabase!");
+        const tenantId = localStorage.getItem('tenantId');
+        const designersWithTenant = designers.map(d => ({ ...d, tenant_id: tenantId }));
+        const { error } = await supabase.from("designers")
+            .upsert(designersWithTenant, { onConflict: ["tenant_id", "name"] });
+
+        if (error) {
+            console.error(error);
+            alert("Error saving designers: " + error.message);
+            return;
+        }
+
+        const { data } = await supabase.from("designers").select("*").eq("tenant_id", tenantId);
+        designers = data || [];
+        renderDesigners();
+        alert("Designers saved to Supabase!");
     });
 
     // ----- Load Data from Supabase -----
     async function loadFromSupabase() {
         const tenantId = localStorage.getItem('tenantId');
+
         const { data: flowerData } = await supabase.from("flowers").select("*").eq("tenant_id", tenantId);
-const { data: hardGoodData } = await supabase.from("hard_goods").select("*").eq("tenant_id", tenantId);
-const { data: designerData } = await supabase.from("designers").select("*").eq("tenant_id", tenantId);
-const { data: percData } = await supabase.from("percentages").select("*").eq("tenant_id", tenantId);
+        const { data: hardGoodData } = await supabase.from("hard_goods").select("*").eq("tenant_id", tenantId);
+        const { data: designerData } = await supabase.from("designers").select("*").eq("tenant_id", tenantId);
+        const { data: percData } = await supabase.from("percentages").select("*").eq("tenant_id", tenantId);
+
         flowers = flowerData || [];
         hardGoods = hardGoodData || [];
         designers = designerData || [];
