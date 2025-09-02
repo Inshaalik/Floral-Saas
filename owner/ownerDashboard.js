@@ -136,10 +136,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     // ----- Navigation -----
-    navAdminBtn?.addEventListener("click", () => window.location.href = "../admin/admin.html");
+    navAdminBtn?.addEventListener("click", () => window.location.href = "../admin/index.html");
     navCalculatorBtn?.addEventListener("click", () => window.location.href = "../flowerCalculator.html");
-    navAnalyticsBtn?.addEventListener("click", () => window.location.href = "../analytics.html");
-    homeBtn?.addEventListener("click", () => window.location.href = "./ownerDashboard.html");
+    navAnalyticsBtn?.addEventListener("click", () => window.location.href = "../analytics/index.html");
+    homeBtn?.addEventListener("click", () => window.location.href = "./owner/ownerDashboard.html");
 
     // ----- Initialize -----
     await loadOwnerAndSubUsers();
