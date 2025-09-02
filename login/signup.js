@@ -10,48 +10,40 @@ signupForm?.addEventListener('submit', async (e) => {
   const password = document.getElementById('password').value.trim();
   const shopName = document.getElementById('shopName').value.trim();
 
-  // 1. Sign up user with Supabase Auth
-  const { data, error } = await supabase.auth.signUp({ email, password });
-  if (error) {
-    alert(error.message);
-    return;
-  }
+  // 1️⃣ Sign up user
+  const { data: signUpData, error: signUpError } = await supabase.auth.signUp({ email, password });
+  if (signUpError) return alert(signUpError.message);
 
-  // 2️⃣ Wait for user to be fully authenticated
-const userId = data.user.id;
+  const userId = signUpData.user.id;
 
-// Insert profile using a session-aware client
-const { error: profileError } = await supabase.from('profiles').insert([{
-  id: userId,
-  email,
-  full_name: fullName
-}]);
+  // 2️⃣ Sign in immediately
+  const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+  if (signInError) return alert(signInError.message);
 
-if (profileError) {
-  alert("Profile creation failed: " + profileError.message);
-  return;
-}
+  // 3️⃣ Insert profile (now user is authenticated)
+  const { error: profileError } = await supabase.from('profiles').insert([{
+    id: userId,
+    email,
+    full_name: fullName
+  }]);
+  if (profileError) return alert("Profile creation failed: " + profileError.message);
 
-  // 3. Create tenant (shop)
+  // 4️⃣ Create tenant (shop)
   const { data: tenantData, error: tenantError } = await supabase
     .from('tenants')
     .insert([{ name: shopName, slug: shopName.toLowerCase().replace(/\s+/g, '-') }])
     .select()
     .single();
+  if (tenantError) return alert(tenantError.message);
 
-  if (tenantError) {
-    alert(tenantError.message);
-    return;
-  }
-
-  // 4. Create membership (owner)
+  // 5️⃣ Create membership (owner)
   await supabase.from('memberships').insert([{
     tenant_id: tenantData.id,
     user_id: userId,
     role: 'owner'
   }]);
 
-  // 5. Store tenantId and redirect
+  // 6️⃣ Store tenantId & redirect
   localStorage.setItem('tenantId', tenantData.id);
   alert('Sign up successful! You are now the owner of your shop.');
   window.location.href = '../flowerCalculator.html';
