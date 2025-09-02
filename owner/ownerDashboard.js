@@ -140,6 +140,20 @@ document.addEventListener("DOMContentLoaded", async () => {
     navCalculatorBtn?.addEventListener("click", () => window.location.href = "../flowerCalculator.html");
     navAnalyticsBtn?.addEventListener("click", () => window.location.href = "../analytics/index.html");
     homeBtn?.addEventListener("click", () => window.location.href = "./owner/ownerDashboard.html");
+    const logoutBtn = document.getElementById("logoutBtn");
+
+logoutBtn?.addEventListener("click", async () => {
+    try {
+        await supabase.auth.signOut();
+        localStorage.removeItem("currentUser");
+        localStorage.removeItem("role");
+        localStorage.removeItem("tenantId");
+        window.location.href = "../login/login.html";
+    } catch (err) {
+        console.error("Logout failed:", err);
+        alert("Logout failed. Please try again.");
+    }
+});
 
     // ----- Initialize -----
     await loadOwnerAndSubUsers();
