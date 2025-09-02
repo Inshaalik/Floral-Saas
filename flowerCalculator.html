@@ -6,84 +6,105 @@
     <title>Floral Budget Calculator</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
-         <body>
-  <!-- Access restriction: owners and sub-users -->
-  <script src="js/session.js"></script>
-  <script>
-    requireRole(['owner', 'sub-user']); 
-  </script>
-             
+<body>
+
+    <!-- Navigation -->
     <nav>
-  <ul class="nav-menu">
-    <li><a href="index.html">🏠 Home</a></li>
-    <li><a href="flowerCalculator.html">🌼 Flower Calculator</a></li>
-    <li><a href="admin/index.html">⚙️ Admin Dashboard</a></li>
-    <li><a href="analytics/index.html">📊 Analytics</a></li>
-    <li><a href="analytics/flower-usage/flower-usage.html">📈 Flower Usage</a></li>
-  </ul>
-</nav>
+        <ul class="nav-menu">
+            <li><a href="index.html" id="homeLink">🏠 Home</a></li>
+            <li><a href="flowerCalculator.html">🌼 Flower Calculator</a></li>
+            <li><a href="admin/index.html">⚙️ Admin Dashboard</a></li>
+            <li><a href="analytics/index.html">📊 Analytics</a></li>
+            <li><a href="analytics/flower-usage/flower-usage.html">📈 Flower Usage</a></li>
+            <li><button id="logoutBtn">🚪 Logout</button></li>
+        </ul>
+    </nav>
 
+    <header>
+        <h1>🌸 Floral Budget Calculator 🌸</h1>
+    </header>
 
-<header>
-    <h1>🌸 Floral Budget Calculator 🌸</h1>
-</header>
+    <main>
+        <!-- Recipe Info -->
+        <section>
+            <h2>Recipe Name</h2>
+            <input type="text" id="recipeName" placeholder="Enter recipe name">
 
-<main>
-    <!-- Recipe Info -->
-    <section>
-        <h2>Recipe Name</h2>
-        <input type="text" id="recipeName" placeholder="Enter recipe name">
+            <h2>Designer</h2>
+            <select id="designerSelect">
+                <option value="">--Select Designer--</option>
+            </select>
+        </section>
 
-        <h2>Designer</h2>
-        <select id="designerSelect">
-            <option value="">--Select Designer--</option>
-        </select>
-    </section>
+        <!-- Customer Price -->
+        <section>
+            <h2>Customer Price</h2>
+            <input type="number" id="customerPrice" value="0">
+        </section>
 
-    <!-- Customer Price -->
-    <section>
-        <h2>Customer Price</h2>
-        <input type="number" id="customerPrice" value="0">
-    </section>
+        <!-- Hard Goods -->
+        <section>
+            <h2>Hard Goods</h2>
+            <select id="hardGoodsSelect">
+                <option value="">--Select Hard Good--</option>
+            </select>
+        </section>
 
-    <!-- Hard Goods -->
-    <section>
-        <h2>Hard Goods</h2>
-        <select id="hardGoodsSelect">
-            <option value="">--Select Hard Good--</option>
-        </select>
-    </section>
+        <!-- Flowers -->
+        <section>
+            <h2>Flowers</h2>
+            <div id="flowerList"></div>
+            <button id="addFlowerButton">Add Flower</button>
+        </section>
 
-    <!-- Flowers -->
-    <section>
-        <h2>Flowers</h2>
-        <div id="flowerList"></div>
-        <button id="addFlowerButton">Add Flower</button>
-    </section>
+        <!-- Other Costs / Percentages -->
+        <section>
+            <h2>Other Costs / Percentages</h2>
+            <label>Greens: $<input type="number" id="greens" value="0"></label><br>
+            <label>Wastage: $<input type="number" id="wastage" value="0"></label><br>
+            <label>CC Fee: $<input type="number" id="ccfee" value="0"></label><br>
+        </section>
 
-    <!-- Other Costs / Percentages -->
-    <section>
-        <h2>Other Costs / Percentages</h2>
-        <label>Greens: $<input type="number" id="greens" value="0"></label><br>
-        <label>Wastage: $<input type="number" id="wastage" value="0"></label><br>
-        <label>CC Fee: $<input type="number" id="ccfee" value="0"></label><br>
-    </section>
+        <!-- Totals -->
+        <section>
+            <h2>Total Flower Cost: $<span id="flowerTotal">0</span></h2>
+            <h2>Remaining Budget: $<span id="remaining">0</span></h2>
+        </section>
 
-    <!-- Totals -->
-    <section>
-        <h2>Total Flower Cost: $<span id="flowerTotal">0</span></h2>
-        <h2>Remaining Budget: $<span id="remaining">0</span></h2>
-    </section>
-    <section>
-    <button id="saveRecipeButton">Save Recipe</button>
-</section>
+        <!-- Save Recipe -->
+        <section>
+            <button id="saveRecipeButton">Save Recipe</button>
+        </section>
+    </main>
 
-</main>
+    <!-- Scripts -->
+    <script type="module">
+        import { requireRole, getCurrentUser } from './js/session.js';
+        import { supabase } from './js/supabaseClient.js';
 
-<script type="module" src="js/sharedData.js"></script>
-<script type="module" src="js/script.js"></script>
-<script type="module" src="./js/testSupabase.js"></script>
+        // ----- Access control -----
+        await requireRole(['owner', 'sub-user']);
 
+        // ----- Dynamic Home link -----
+        const user = await getCurrentUser();
+        const homeLink = document.getElementById('homeLink');
+        if (user?.role === 'owner') {
+            homeLink.href = './owner/ownerDashboard.html';
+        } else {
+            homeLink.href = './flowerCalculator.html';
+        }
+
+        // ----- Logout button -----
+        document.getElementById('logoutBtn')?.addEventListener('click', async () => {
+            await supabase.auth.signOut();
+            localStorage.clear();
+            window.location.href = './login/login.html';
+        });
+    </script>
+
+    <script type="module" src="js/sharedData.js"></script>
+    <script type="module" src="js/script.js"></script>
+    <script type="module" src="./js/testSupabase.js"></script>
 
 </body>
 </html>
