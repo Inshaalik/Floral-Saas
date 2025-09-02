@@ -177,9 +177,14 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     saveFlowersButton.addEventListener("click", async () => {
+         const tenantId = localStorage.getItem('tenantId');
+    const flowersWithTenant = flowers.map(flower => ({
+        ...flower,
+        tenant_id: tenantId
+    }));
         const { error } = await supabase
             .from("flowers")
-            .upsert(flowers, { onConflict: "id" });
+            .upsert(flowersWithTenant, { onConflict: "id" });
         if (error) console.error(error);
         else alert("Flowers saved to Supabase!");
     });
@@ -190,14 +195,22 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     saveHardGoodsButton.addEventListener("click", async () => {
+        const tenantId = localStorage.getItem('tenantId');
+    const hardGoodsWithTenant = hardGoods.map(item => ({
+        ...item,
+        tenant_id: tenantId
+    }));
         const { error } = await supabase
             .from("hard_goods")
-            .upsert(hardGoods, { onConflict: "id" });
+            .upsert(hardGoodsWithTenant, { onConflict: "id" });
         if (error) console.error(error);
         else alert("Hard Goods saved to Supabase!");
     });
 
     savePercentagesButton.addEventListener("click", async () => {
+        const tenantId = localStorage.getItem('tenantId');
+    percentages.tenant_id = tenantId;
+
         percentages.greens = parseFloat(greensInput.value) || 0;
         percentages.wastage = parseFloat(wastageInput.value) || 0;
         percentages.ccfee = parseFloat(ccfeeInput.value) || 0;
@@ -219,20 +232,25 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     saveDesignersButton.addEventListener("click", async () => {
+         const tenantId = localStorage.getItem('tenantId');
+    const designersWithTenant = designers.map(designer => ({
+        ...designer,
+        tenant_id: tenantId
+    }));
         const { error } = await supabase
             .from("designers")
-            .upsert(designers, { onConflict: "id" });
+            .upsert(designersWithTenant, { onConflict: "id" });
         if (error) console.error(error);
         else alert("Designers saved to Supabase!");
     });
 
     // ----- Load Data from Supabase -----
     async function loadFromSupabase() {
-        const { data: flowerData } = await supabase.from("flowers").select("*");
-        const { data: hardGoodData } = await supabase.from("hard_goods").select("*");
-        const { data: designerData } = await supabase.from("designers").select("*");
-        const { data: percData } = await supabase.from("percentages").select("*");
-
+        const tenantId = localStorage.getItem('tenantId');
+        const { data: flowerData } = await supabase.from("flowers").select("*").eq("tenant_id", tenantId);
+const { data: hardGoodData } = await supabase.from("hard_goods").select("*").eq("tenant_id", tenantId);
+const { data: designerData } = await supabase.from("designers").select("*").eq("tenant_id", tenantId);
+const { data: percData } = await supabase.from("percentages").select("*").eq("tenant_id", tenantId);
         flowers = flowerData || [];
         hardGoods = hardGoodData || [];
         designers = designerData || [];

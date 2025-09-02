@@ -1,39 +1,42 @@
-// login/login.js
-
-// Hardcoded users for demo purposes
-  const users = [
-    { email: "owner@flowershop1.com", password: "owner123", role: "owner", tenantId: "shop1" },
-    { email: "subuser1@flowershop1.com", password: "sub123", role: "sub-user", tenantId: "shop1" },
-    { email: "subuser2@flowershop1.com", password: "sub456", role: "sub-user", tenantId: "shop1" },
-    { email: "owner@flowershop2.com", password: "owner789", role: "owner", tenantId: "shop2" },
-    { email: "subuser1@flowershop2.com", password: "sub789", role: "sub-user", tenantId: "shop2" }
-
-];
+import { supabase } from '../js/supabaseClient.js';
 
 const loginForm = document.getElementById('loginForm');
 
-loginForm?.addEventListener('submit', (e) => {
+loginForm?.addEventListener('submit', async (e) => {
   e.preventDefault();
 
   const email = document.getElementById('email').value.trim();
   const password = document.getElementById('password').value.trim();
 
-  // Check credentials against hardcoded users
-  const user = users.find(u => u.email === email && u.password === password);
+  // Supabase Auth login
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error) {
+    alert('Invalid email or password');
+    return;
+  }
 
-  if (user) {
-    // Save user session in localStorage
-      localStorage.setItem('currentUser', JSON.stringify(user));
-      localStorage.setItem('tenantId', user.tenantId); // <-- Add this line
-      alert(`Logged in as ${user.email} (${user.role})`);
-    
-      // Redirect based on role
-      if (user.role === "owner" || user.role === "sub-user") {
-        window.location.href = '../flowerCalculator.html';
-      }
-      } else {
-  alert('Invalid email or password');
-}
-    }
+  const userId = data.user.id;
 
-);
+  // Fetch membership for tenant and role
+  const { data: memberships, error: membershipError } = await supabase
+    .from('memberships')
+    .select('tenant_id, role')
+    .eq('user_id', userId);
+
+  if (membershipError) {
+    alert('Error fetching membership: ' + membershipError.message);
+    return;
+  }
+
+  if (!memberships || memberships.length === 0) {
+    alert('No shop membership found for this user.');
+    return;
+  }
+
+  // Use first membership (or handle multiple if needed)
+  localStorage.setItem('tenantId', memberships[0].tenant_id);
+  localStorage.setItem('role', memberships[0].role);
+
+  alert(`Logged in as ${email} (${memberships[0].role})`);
+  window.location.href = '../flowerCalculator.html';
+});
