@@ -1,10 +1,13 @@
 // login/login.js
 
 // Hardcoded users for demo purposes
-const users = [
-  { email: "owner@flowershop.com", password: "owner123", role: "owner" },
-  { email: "subuser1@flowershop.com", password: "sub123", role: "sub-user" },
-  { email: "subuser2@flowershop.com", password: "sub456", role: "sub-user" }
+  const users = [
+    { email: "owner@flowershop1.com", password: "owner123", role: "owner", tenantId: "shop1" },
+    { email: "subuser1@flowershop1.com", password: "sub123", role: "sub-user", tenantId: "shop1" },
+    { email: "subuser2@flowershop1.com", password: "sub456", role: "sub-user", tenantId: "shop1" },
+    { email: "owner@flowershop2.com", password: "owner789", role: "owner", tenantId: "shop2" },
+    { email: "subuser1@flowershop2.com", password: "sub789", role: "sub-user", tenantId: "shop2" }
+
 ];
 
 const loginForm = document.getElementById('loginForm');
@@ -20,14 +23,17 @@ loginForm?.addEventListener('submit', (e) => {
 
   if (user) {
     // Save user session in localStorage
-    localStorage.setItem('currentUser', JSON.stringify(user));
-    alert(`Logged in as ${user.email} (${user.role})`);
-
+      localStorage.setItem('currentUser', JSON.stringify(user));
+      localStorage.setItem('tenantId', user.tenantId); // <-- Add this line
+      alert(`Logged in as ${user.email} (${user.role})`);
+    
       // Redirect based on role
-    if (user.role === "owner" || user.role === "sub-user") {
-      window.location.href = '../flowerCalculator.html';
+      if (user.role === "owner" || user.role === "sub-user") {
+        window.location.href = '../flowerCalculator.html';
+      }
+      } else {
+  alert('Invalid email or password');
+}
     }
-  } else {
-    alert('Invalid email or password');
-  }
-});
+
+);

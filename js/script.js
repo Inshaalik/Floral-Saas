@@ -9,6 +9,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     // ----- Load shared data initially -----
     await loadSharedData();
 
+     // ----- Set tenant ID from localStorage -----
+    window.currentTenantId = localStorage.getItem('tenantId');
+    if (!window.currentTenantId) {
+        alert('Tenant ID missing. Please log in again.');
+        window.location.href = 'login/login.html';
+        return;
+    }
+
+
     // ----- Initialize arrays AFTER data has loaded -----
     let flowersData = window.masterFlowers || [];
     let hardGoodsData = window.masterHardGoods || [];
