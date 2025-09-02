@@ -11,13 +11,13 @@ signupForm?.addEventListener('submit', async (e) => {
   const shopName = document.getElementById('shopName').value.trim();
 
   try {
-    // 1️⃣ Sign up the user
+    // 1️⃣ Sign up user
     const { data: signUpData, error: signUpError } = await supabase.auth.signUp({ email, password });
     if (signUpError) throw signUpError;
 
     const userId = signUpData.user.id;
 
-    // 2️⃣ Sign in immediately so the session is authenticated
+    // 2️⃣ Sign in immediately
     const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
     if (signInError) throw signInError;
 
@@ -29,15 +29,19 @@ signupForm?.addEventListener('submit', async (e) => {
     }]);
     if (profileError) throw profileError;
 
-    // 4️⃣ Create tenant (shop)
+    // 4️⃣ Create tenant with owner_id
     const { data: tenantData, error: tenantError } = await supabase
       .from('tenants')
-      .insert([{ name: shopName, slug: shopName.toLowerCase().replace(/\s+/g, '-') }])
+      .insert([{
+        name: shopName,
+        slug: shopName.toLowerCase().replace(/\s+/g, '-'),
+        owner_id: userId
+      }])
       .select()
       .single();
     if (tenantError) throw tenantError;
 
-    // 5️⃣ Create membership (owner)
+    // 5️⃣ Create membership
     const { error: membershipError } = await supabase.from('memberships').insert([{
       tenant_id: tenantData.id,
       user_id: userId,
@@ -45,7 +49,7 @@ signupForm?.addEventListener('submit', async (e) => {
     }]);
     if (membershipError) throw membershipError;
 
-    // 6️⃣ Store tenantId locally and redirect
+    // 6️⃣ Store tenantId and redirect
     localStorage.setItem('tenantId', tenantData.id);
     alert('Sign up successful! You are now the owner of your shop.');
     window.location.href = '../flowerCalculator.html';
