@@ -17,10 +17,20 @@ signupForm?.addEventListener('submit', async (e) => {
     return;
   }
 
-  const userId = data.user.id;
+  // 2️⃣ Wait for user to be fully authenticated
+const userId = data.user.id;
 
-  // 2. Create profile
-  await supabase.from('profiles').insert([{ id: userId, email, full_name: fullName }]);
+// Insert profile using a session-aware client
+const { error: profileError } = await supabase.from('profiles').insert([{
+  id: userId,
+  email,
+  full_name: fullName
+}]);
+
+if (profileError) {
+  alert("Profile creation failed: " + profileError.message);
+  return;
+}
 
   // 3. Create tenant (shop)
   const { data: tenantData, error: tenantError } = await supabase
