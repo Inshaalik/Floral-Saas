@@ -8,10 +8,11 @@
 </head>
 <body>
     <!-- Access restriction: owners only -->
-    <script src="../js/session.js"></script>
-    <script>
-        requireRole(['owner']); 
-    </script>
+    <script type="module">
+    import { requireRole } from "../js/session.js";
+    requireRole(['owner']);
+</script>
+
 
     <nav>
         <ul class="nav-menu">
