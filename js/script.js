@@ -113,6 +113,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         flowerTotalOutput.textContent = totalSpent.toFixed(2);
         remainingOutput.textContent = remaining.toFixed(2);
+
+         // 🔴 make negative values red
+  if (remaining < 0) {
+    remainingOutput.style.color = "red";
+  } else {
+    remainingOutput.style.color = "";
+  }
     }
 
     // ----- Event Listeners -----

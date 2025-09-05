@@ -132,15 +132,28 @@ button:hover {
 /* ---------- Calculator Page Layout ---------- */
 .calculator-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* slightly smaller */
-  gap: 1rem;
+  grid-template-areas:
+    "recipe customer flowers"
+    "hardgoods percentages flowers"
+    "totals totals flowers";
+  grid-template-columns: 1fr 1fr 1.5fr; /* 2 smaller columns + wider flower list */
+  grid-gap: 1.25rem;
   max-width: 1200px;
   margin: 0 auto;
 }
 
-.calculator-grid > section {
-  flex: 1;
+section {
+  height: 100%; /* prevent stretching mismatch */
 }
+
+/* Assign areas */
+section.recipe { grid-area: recipe; }
+section.customer { grid-area: customer; }
+section.hardgoods { grid-area: hardgoods; }
+section.percentages { grid-area: percentages; }
+section.totals { grid-area: totals; }
+section.flowers { grid-area: flowers; }
+
 
 /* ---------- Small Labels ---------- */
 label {
