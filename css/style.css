@@ -137,13 +137,14 @@ button:hover {
     "hardgoods percentages flowers"
     "totals totals flowers";
   grid-template-columns: 1fr 1fr 1.5fr; /* 2 smaller columns + wider flower list */
+  grid-template-rows: auto auto min-content; /* totals row is only as tall as content */
   grid-gap: 1.25rem;
   max-width: 1200px;
   margin: 0 auto;
 }
 
 section {
-  height: 100%; /* prevent stretching mismatch */
+  /* remove height:100% to avoid forcing sections to stretch */
 }
 
 /* Assign areas */
@@ -151,7 +152,14 @@ section.recipe { grid-area: recipe; }
 section.customer { grid-area: customer; }
 section.hardgoods { grid-area: hardgoods; }
 section.percentages { grid-area: percentages; }
-section.totals { grid-area: totals; }
+section.totals { 
+  grid-area: totals; 
+  display: flex; 
+  justify-content: flex-start; /* or space-between if you want spread */
+  align-items: center;
+  background: transparent; /* remove giant colored box */
+  padding: 0; /* optional: remove extra padding */
+}
 section.flowers { grid-area: flowers; }
 
 

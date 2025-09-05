@@ -36,10 +36,13 @@
         </select>
     </section>
 
-    <!-- Customer Price -->
-    <section class="customer">
-        <h2>Customer Price</h2>
-        <input type="number" id="customerPrice" value="0">
+    <!-- Customer Price + Percentages -->
+    <section class="customer-percentages">
+        <h2>Customer Price & Costs</h2>
+        <label>Customer Price: $<input type="number" id="customerPrice" value="0"></label>
+        <label>Greens: $<input type="number" id="greens" value="0"></label>
+        <label>Wastage: $<input type="number" id="wastage" value="0"></label>
+        <label>CC Fee: $<input type="number" id="ccfee" value="0"></label>
     </section>
 
     <!-- Hard Goods -->
@@ -50,12 +53,19 @@
         </select>
     </section>
 
-    <!-- Other Costs / Percentages -->
-    <section class="percentages">
-        <h2>Other Costs / Percentages</h2>
-        <label>Greens: $<input type="number" id="greens" value="0"></label><br>
-        <label>Wastage: $<input type="number" id="wastage" value="0"></label><br>
-        <label>CC Fee: $<input type="number" id="ccfee" value="0"></label><br>
+    <!-- Flowers (right column) -->
+    <section class="flowers">
+        <h2>Flowers</h2>
+        <label for="flowerSelect">Select Flower:</label>
+        <input list="flowerOptions" id="flowerSelect" placeholder="Type or pick a flower">
+        <datalist id="flowerOptions"></datalist>
+
+        <label for="flowerQty">Quantity:</label>
+        <input type="number" id="flowerQty" value="1" min="1">
+
+        <button id="addFlowerButton">Add Flower</button>
+
+        <div id="flowerList"></div>
     </section>
 
     <!-- Totals -->
@@ -72,24 +82,6 @@
                 <button id="saveRecipeButton" style="display:none;"></button>
             </div>
         </div>
-    </section>
-
-    <!-- Flowers (long right column) -->
-    <section class="flowers">
-        <h2>Flowers</h2>
-        
-        <label for="flowerSelect">Select Flower:</label>
-        <input list="flowerOptions" id="flowerSelect" placeholder="Type or pick a flower">
-        <datalist id="flowerOptions">
-            <!-- Options will be populated dynamically by JS -->
-        </datalist>
-
-        <label for="flowerQty">Quantity:</label>
-        <input type="number" id="flowerQty" value="1" min="1">
-
-        <button id="addFlowerButton">Add Flower</button>
-
-        <div id="flowerList"></div>
     </section>
 </main>
 

@@ -95,32 +95,31 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     }
 
-    function updateTotals() {
-        const flowerTotal = flowers.reduce((sum, f) => sum + (f.price * (f.quantity || 0)), 0);
-        const hardGoodsCost = selectedHardGood.price || 0;
-        const customerPrice = Number(customerPriceInput.value) || 0;
+   function updateTotals() {
+    const flowerTotal = flowers.reduce((sum, f) => sum + (f.price * (f.quantity || 0)), 0);
+    const hardGoodsCost = selectedHardGood.price || 0;
+    const customerPrice = Number(customerPriceInput.value) || 0;
 
-        const greensValue = (percentagesData.greens / 100) * customerPrice;
-        const wastageValue = (percentagesData.wastage / 100) * customerPrice;
-        const ccfeeValue = (percentagesData.ccfee / 100) * customerPrice;
+    // Pull percentages from admin data
+    const greensValue = (percentagesData.greens / 100) * customerPrice;
+    const wastageValue = (percentagesData.wastage / 100) * customerPrice;
+    const ccfeeValue = (percentagesData.ccfee / 100) * customerPrice;
 
-        greensInput.value = greensValue.toFixed(2);
-        wastageInput.value = wastageValue.toFixed(2);
-        ccfeeInput.value = ccfeeValue.toFixed(2);
+    // Only display greens
+    greensInput.value = greensValue.toFixed(2);
+    wastageInput.value = ""; // hidden / not displayed
+    ccfeeInput.value = "";   // hidden / not displayed
 
-        const totalSpent = flowerTotal + hardGoodsCost + greensValue + wastageValue + ccfeeValue;
-        const remaining = customerPrice - totalSpent;
+    const totalSpent = flowerTotal + hardGoodsCost + greensValue + wastageValue + ccfeeValue;
+    const remaining = customerPrice - totalSpent;
 
-        flowerTotalOutput.textContent = totalSpent.toFixed(2);
-        remainingOutput.textContent = remaining.toFixed(2);
+    flowerTotalOutput.textContent = totalSpent.toFixed(2);
+    remainingOutput.textContent = remaining.toFixed(2);
 
-         // 🔴 make negative values red
-  if (remaining < 0) {
-    remainingOutput.style.color = "red";
-  } else {
-    remainingOutput.style.color = "";
-  }
-    }
+    // 🔴 Make negative remaining values red
+    remainingOutput.style.color = remaining < 0 ? "red" : "";
+}
+
 
     // ----- Event Listeners -----
     // Hard goods selection
