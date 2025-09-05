@@ -71,7 +71,7 @@ document.addEventListener("DOMContentLoaded", () => {
         addDesignerListeners();
     }
 
-    // ----- Flower listeners (preserve auto-calculations) -----
+    // ----- Flower listeners -----
     function addFlowerListeners() {
         document.querySelectorAll(".flowerName").forEach(input => {
             input.addEventListener("blur", e => {
@@ -166,8 +166,7 @@ document.addEventListener("DOMContentLoaded", () => {
             .upsert(flowersWithTenant, { onConflict: ["tenant_id", "name"] });
         if (error) return alert("Error saving flowers: " + error.message);
         
-         // fetch all rows after upsert
-    const { data } = await supabase.from("flowers").select("*").eq("tenant_id", tenantId);
+        const { data } = await supabase.from("flowers").select("*").eq("tenant_id", tenantId);
         flowers = data || [];
         renderFlowers();
         alert("Flowers saved!");
@@ -184,10 +183,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const { error } = await supabase.from("hard_goods")
             .upsert(hardGoodsWithTenant, { onConflict: ["tenant_id", "name"] });
         if (error) return alert("Error saving hard goods: " + error.message);
+
+        const { data } = await supabase.from("hard_goods").select("*").eq("tenant_id", tenantId);
         hardGoods = data || [];
-        
-          // fetch all hard goods after upsert
-    const { data } = await supabase.from("hard_goods").select("*").eq("tenant_id", tenantId);
         renderHardGoods();
         alert("Hard goods saved!");
     });
@@ -206,10 +204,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const { error } = await supabase.from("designers")
             .upsert(designersWithTenant, { onConflict: ["tenant_id", "name"] });
         if (error) return alert("Error saving designers: " + error.message);
+
+        const { data } = await supabase.from("designers").select("*").eq("tenant_id", tenantId);
         designers = data || [];
-        
-         // fetch all designers after upsert
-    const { data } = await supabase.from("designers").select("*").eq("tenant_id", tenantId);
         renderDesigners();
         alert("Designers saved!");
     });
@@ -224,16 +221,15 @@ document.addEventListener("DOMContentLoaded", () => {
             ccfee: parseFloat(ccfeeInput.value) || 0
         };
         const { error } = await supabase.from("percentages")
-            .upsert([percentages], { onConflict: "id" });
+            .upsert([percentages], { onConflict: ["tenant_id"] });
         if (error) return alert("Error saving percentages: " + error.message);
-  // refresh from DB
-    const { data } = await supabase.from("percentages").select("*").eq("tenant_id", tenantId);
-    percentages = data?.[0] || percentages;
 
-    // update inputs in case DB changed anything
-    greensInput.value = parseFloat(percentages.greens || 0).toFixed(2);
-    wastageInput.value = parseFloat(percentages.wastage || 0).toFixed(2);
-    ccfeeInput.value = parseFloat(percentages.ccfee || 0).toFixed(2);
+        const { data } = await supabase.from("percentages").select("*").eq("tenant_id", tenantId);
+        percentages = data?.[0] || percentages;
+
+        greensInput.value = parseFloat(percentages.greens || 0).toFixed(2);
+        wastageInput.value = parseFloat(percentages.wastage || 0).toFixed(2);
+        ccfeeInput.value = parseFloat(percentages.ccfee || 0).toFixed(2);
 
         alert("Percentages saved!");
     });
@@ -249,7 +245,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         flowers = flowerData || [];
         hardGoods = hardGoodData || [];
-        designers = designerData || []; // <-- empty until Add Designer clicked
+        designers = designerData || [];
         percentages = percData?.[0] || { id: uuidv4(), greens: 0, wastage: 0, ccfee: 0 };
 
         renderFlowers();

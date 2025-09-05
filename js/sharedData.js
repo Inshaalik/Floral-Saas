@@ -5,37 +5,49 @@ import { supabase } from './supabaseClient.js';  // adjust path if needed
 
 // Load saved master data from LocalStorage
 async function loadSharedData() {
-    // First, try to fetch live data from Supabase
     try {
+        const tenantId = localStorage.getItem("tenantId");
+        if (!tenantId) {
+            console.error("Tenant ID missing – cannot load data");
+            return;
+        }
+
+        // Flowers
         const { data: flowersData, error: flowersError } = await supabase
             .from('flowers')
-            .select('name, wholesale, markup, retail'); // <-- pull retail instead of price
+            .select('name, wholesale, markup, retail')
+            .eq('tenant_id', tenantId);
 
         if (flowersError) throw flowersError;
         window.masterFlowers = flowersData || JSON.parse(localStorage.getItem("masterFlowers")) || [];
 
+        // Hard Goods
         const { data: hardGoodsData, error: hardGoodsError } = await supabase
             .from('hard_goods')
-            .select('*');
+            .select('*')
+            .eq('tenant_id', tenantId);
 
         if (hardGoodsError) throw hardGoodsError;
         window.masterHardGoods = hardGoodsData || JSON.parse(localStorage.getItem("masterHardGoods")) || [];
 
+        // Designers
         const { data: designersData, error: designersError } = await supabase
             .from('designers')
-            .select('name');
+            .select('name')
+            .eq('tenant_id', tenantId);
 
         if (designersError) throw designersError;
-        window.masterDesigners = (designersData || []).map(d => d.name) || JSON.parse(localStorage.getItem("masterDesigners")) || [];
+        window.masterDesigners = (designersData || []).map(d => d.name);
 
+        // Percentages (expect 1 row per tenant)
         const { data: percentagesData, error: percError } = await supabase
             .from('percentages')
             .select('*')
-            .limit(1)
+            .eq('tenant_id', tenantId)
             .single();
 
         if (percError) throw percError;
-        window.masterPercentages = percentagesData || JSON.parse(localStorage.getItem("masterPercentages")) || { greens: 0, wastage: 0, ccFee: 0 };
+        window.masterPercentages = percentagesData || { greens: 0, wastage: 0, ccfee: 0 };
 
         // Also save to LocalStorage so pages offline can still work
         saveSharedData();
