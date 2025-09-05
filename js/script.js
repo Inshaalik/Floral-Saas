@@ -38,10 +38,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     let percentagesData = window.masterPercentages || { greens: 0, wastage: 0, ccfee: 0 };
     let designersData = window.masterDesigners || [];
 
-    renderDesigners();
-    renderHardGoods();
-    renderFlowers();
-    updateTotals();
+   // renderDesigners();
+    //renderHardGoods();
+    //renderFlowers();
+    //updateTotals();
 
 
     // ----- State -----
@@ -49,21 +49,34 @@ document.addEventListener("DOMContentLoaded", async () => {
     let selectedHardGood = { name: "", price: 0 };
 
     // ----- Render Functions -----
-   function renderFlowers() {
-    flowerList.innerHTML = "";
+ function renderFlowers() {
+    flowerList.innerHTML = ""; // clear previous list
+
     flowers.forEach((flower, index) => {
         const row = document.createElement("div");
-        row.classList.add("flower-row");
-        row.innerHTML = `
-            ${flower.name || "--Select Flower--"} 
-            x ${flower.quantity || 0} = $${((flower.price || 0) * (flower.quantity || 0)).toFixed(2)}
-            <button data-index="${index}" class="removeButton">Remove</button>
-        `;
+        row.classList.add("flower-row"); // optional for styling
+
+        row.textContent = `${flower.name} $${flower.price.toFixed(2)} x ${flower.quantity}`;
+
+        // Remove button
+        const removeBtn = document.createElement("button");
+        removeBtn.textContent = "Remove";
+        removeBtn.dataset.index = index;
+        removeBtn.classList.add("removeButton");
+
+        removeBtn.addEventListener("click", () => {
+            flowers.splice(index, 1);
+            renderFlowers();
+            updateTotals(); // recalc totals after removal
+        });
+
+        row.appendChild(removeBtn);
         flowerList.appendChild(row);
     });
-    addFlowerListeners();
-    updateTotals();
+
+    updateTotals(); // update spent & remaining
 }
+
 
 
    function addFlowerListeners() {
@@ -134,11 +147,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // ----- Event Listeners -----
    addFlowerButton.addEventListener("click", () => {
-    // Prompt user to select a flower
-    const flowerOptions = flowersData
+    // Dropdown-style prompt
+    const optionsText = flowersData
         .map(f => `${f.name} ($${f.retail.toFixed(2)})`)
         .join("\n");
-    const selectedName = prompt(`Select a flower by typing the name:\n${flowerOptions}`);
+
+    const selectedName = prompt(`Select a flower by typing the name:\n${optionsText}`);
     if (!selectedName) return;
 
     const master = flowersData.find(f => f.name.toLowerCase() === selectedName.toLowerCase());
@@ -147,16 +161,14 @@ document.addEventListener("DOMContentLoaded", async () => {
         return;
     }
 
-    // Prompt for quantity
     const qty = Number(prompt(`Enter quantity for ${master.name}:`, "1"));
     if (!qty || qty <= 0) return;
 
-    // Add to state
     flowers.push({ name: master.name, price: master.retail, quantity: qty });
 
-    // Re-render summary
-    renderFlowers();
+    renderFlowers(); // just summary
 });
+
 
    saveRecipeButton.addEventListener("click", async () => {
     if (!recipeNameInput.value || !designerSelect.value) {
