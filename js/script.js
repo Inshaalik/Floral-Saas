@@ -24,6 +24,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     let percentagesData = window.masterPercentages || { greens: 0, wastage: 0, ccfee: 0 };
     let designersData = window.masterDesigners || [];
 
+    renderDesigners();
+    renderHardGoods();
+    renderFlowers();
+    updateTotals();
+
     // ----- DOM Elements -----
     const recipeNameInput = document.getElementById("recipeName");
     const designerSelect = document.getElementById("designerSelect");
@@ -99,7 +104,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         hardGoodsData.forEach(h => {
             const option = document.createElement("option");
             option.value = h.name;
-            option.textContent = `${h.name} ($${h.price})`;
+            option.textContent = `${h.name} ($${h.price || 0})`;
             hardGoodsSelect.appendChild(option);
         });
     }
@@ -108,8 +113,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         designerSelect.innerHTML = '<option value="">--Select Designer--</option>';
         designersData.forEach(d => {
             const option = document.createElement("option");
-            option.value = d;
-            option.textContent = d;
+            option.value = d.name;
+            option.textContent = d.name;
             designerSelect.appendChild(option);
         });
     }
