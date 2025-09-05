@@ -79,8 +79,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         designerSelect.innerHTML = '<option value="">--Select Designer--</option>';
         designersData.forEach(d => {
             const option = document.createElement("option");
-            option.value = d.name;
-            option.textContent = d.name;
+            option.value = d;
+            option.textContent = d;
             designerSelect.appendChild(option);
         });
     }
