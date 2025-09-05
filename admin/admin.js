@@ -165,7 +165,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const { error } = await supabase.from("flowers")
             .upsert(flowersWithTenant, { onConflict: ["tenant_id", "name"] });
         if (error) return alert("Error saving flowers: " + error.message);
-        
+
         const { data } = await supabase.from("flowers").select("*").eq("tenant_id", tenantId);
         flowers = data || [];
         renderFlowers();
@@ -221,7 +221,7 @@ document.addEventListener("DOMContentLoaded", () => {
             ccfee: parseFloat(ccfeeInput.value) || 0
         };
         const { error } = await supabase.from("percentages")
-            .upsert([percentages], { onConflict: ["tenant_id"] });
+            .upsert([percentages], { onConflict: "id" });
         if (error) return alert("Error saving percentages: " + error.message);
 
         const { data } = await supabase.from("percentages").select("*").eq("tenant_id", tenantId);
