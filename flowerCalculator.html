@@ -24,58 +24,53 @@
         <h1>🌸 Floral Budget Calculator 🌸</h1>
     </header>
 
-    <main>
-        <!-- Recipe Info -->
-        <section>
-            <h2>Recipe Name</h2>
-            <input type="text" id="recipeName" placeholder="Enter recipe name">
+   <main class="calculator-grid">
+    <!-- Recipe Info -->
+    <section>
+        <h2>Recipe Name</h2>
+        <input type="text" id="recipeName" placeholder="Enter recipe name">
 
-            <h2>Designer</h2>
-            <select id="designerSelect">
-                <option value="">--Select Designer--</option>
-            </select>
-        </section>
+        <h2>Designer</h2>
+        <select id="designerSelect">
+            <option value="">--Select Designer--</option>
+        </select>
+    </section>
 
-        <!-- Customer Price -->
-        <section>
-            <h2>Customer Price</h2>
-            <input type="number" id="customerPrice" value="0">
-        </section>
+    <!-- Customer Price -->
+    <section>
+        <h2>Customer Price</h2>
+        <input type="number" id="customerPrice" value="0">
+    </section>
 
-        <!-- Hard Goods -->
-        <section>
-            <h2>Hard Goods</h2>
-            <select id="hardGoodsSelect">
-                <option value="">--Select Hard Good--</option>
-            </select>
-        </section>
+    <!-- Hard Goods -->
+    <section>
+        <h2>Hard Goods</h2>
+        <select id="hardGoodsSelect">
+            <option value="">--Select Hard Good--</option>
+        </select>
+    </section>
 
-        <!-- Flowers -->
-        <section>
-            <h2>Flowers</h2>
-            <div id="flowerList"></div>
-            <button id="addFlowerButton">Add Flower</button>
-        </section>
+    <!-- Flowers -->
+    <section>
+        <h2>Flowers</h2>
+        <div id="flowerList"></div>
+        <button id="addFlowerButton">Add Flower</button>
+    </section>
 
-        <!-- Other Costs / Percentages -->
-        <section>
-            <h2>Other Costs / Percentages</h2>
-            <label>Greens: $<input type="number" id="greens" value="0"></label><br>
-            <label>Wastage: $<input type="number" id="wastage" value="0"></label><br>
-            <label>CC Fee: $<input type="number" id="ccfee" value="0"></label><br>
-        </section>
+    <!-- Other Costs / Percentages -->
+    <section>
+        <h2>Other Costs / Percentages</h2>
+        <label>Greens: $<input type="number" id="greens" value="0"></label><br>
+        <label>Wastage: $<input type="number" id="wastage" value="0"></label><br>
+        <label>CC Fee: $<input type="number" id="ccfee" value="0"></label><br>
+    </section>
 
-        <!-- Totals -->
-        <section>
-            <h2>Total Flower Cost: $<span id="flowerTotal">0</span></h2>
-            <h2>Remaining Budget: $<span id="remaining">0</span></h2>
-        </section>
-
-        <!-- Save Recipe -->
-        <section>
-            <button id="saveRecipeButton">Save Recipe</button>
-        </section>
-    </main>
+    <!-- Totals -->
+    <section>
+        <h2>Total Flower Cost: $<span id="flowerTotal">0</span></h2>
+        <h2>Remaining Budget: $<span id="remaining">0</span></h2>
+    </section>
+</main>
 
     <!-- Scripts -->
     <script type="module">

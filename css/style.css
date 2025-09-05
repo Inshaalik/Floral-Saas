@@ -1,54 +1,167 @@
-/* Basic page styling */
+/* ====== Base Styles ====== */
 body {
-    font-family: Arial, sans-serif;
-    text-align: center;
-    background-color: #fff8f0;
-    color: #444;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    color: #333;
+    background-color: #fff8f4;
     margin: 0;
     padding: 0;
+    line-height: 1.5;
 }
 
-/* Header styling */
-header {
-    background-color: #f9c5d1;
-    padding: 20px;
-    border-bottom: 3px solid #e09ba0;
+h1, h2 {
+    font-family: 'Georgia', serif;
+    color: #d6336c;
+    margin-bottom: 10px;
 }
 
-/* Button styling */
-button {
-    background-color: #ff85a2;
-    border: none;
-    padding: 12px 24px;
-    font-size: 16px;
-    color: white;
-    cursor: pointer;
-    border-radius: 8px;
-    margin-top: 20px;
+h1 {
+    font-size: 2.2em;
+    text-align: center;
 }
 
-button:hover {
-    background-color: #ff6b8a;
+h2 {
+    font-size: 1.5em;
 }
-/*Nav styling */
+
+/* ====== Navigation ====== */
 nav {
-  background: #ffeef1;
-  padding: 10px 20px;
+    background-color: #ffe4e8;
+    padding: 10px 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
 .nav-menu {
-  list-style: none;
-  display: flex;
-  gap: 15px;
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin: 0;
+    padding: 0;
+    justify-content: center;
 }
 
-.nav-menu li a {
-  text-decoration: none;
-  color: #333;
-  font-weight: bold;
+.nav-menu li a,
+.nav-menu li button {
+    text-decoration: none;
+    color: #444;
+    font-weight: bold;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1em;
 }
 
-.nav-menu li a:hover {
-  color: #d6336c;
+.nav-menu li a:hover,
+.nav-menu li button:hover {
+    color: #ff597b;
 }
 
+/* ====== Header ====== */
+header {
+    background-color: #ffdce1;
+    padding: 20px;
+    border-bottom: 3px solid #ff85a2;
+}
+
+/* ====== Buttons ====== */
+button {
+    background-color: #ff85a2;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+button:hover {
+    background-color: #ff597b;
+}
+
+/* ====== Forms & Inputs ====== */
+input[type="text"],
+input[type="number"],
+select {
+    width: 100%;
+    padding: 8px;
+    margin: 5px 0 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+/* ====== Tables ====== */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+th, td {
+    border: 1px solid #e5c4d0;
+    padding: 8px;
+    text-align: left;
+}
+
+th {
+    background-color: #ffdce1;
+    color: #d6336c;
+}
+
+tr:nth-child(even) {
+    background-color: #fff0f5;
+}
+
+/* ====== Flower Calculator Grid ====== */
+.calculator-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
+
+.calculator-grid section {
+    background: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    text-align: left;
+}
+
+/* Optional: better spacing for inputs inside sections */
+.calculator-grid section input,
+.calculator-grid section select {
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+
+/* ====== Totals ====== */
+#flowerTotal,
+#remaining {
+    font-weight: bold;
+    color: #d6336c;
+    font-size: 1.2em;
+}
+
+/* ====== Responsive Adjustments ====== */
+@media (max-width: 600px) {
+    .nav-menu {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .calculator-grid {
+        grid-template-columns: 1fr;
+        padding: 10px;
+    }
+}
+
+/* ====== Alerts / Notifications (Optional) ====== */
+.alert {
+    background-color: #ffb3c1;
+    color: #800026;
+    padding: 10px;
+    border-radius: 5px;
+    margin: 10px 0;
+}
