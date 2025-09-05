@@ -18,17 +18,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
 
-    // ----- Initialize arrays AFTER data has loaded -----
-    let flowersData = window.masterFlowers || [];
-    let hardGoodsData = window.masterHardGoods || [];
-    let percentagesData = window.masterPercentages || { greens: 0, wastage: 0, ccfee: 0 };
-    let designersData = window.masterDesigners || [];
-
-    renderDesigners();
-    renderHardGoods();
-    renderFlowers();
-    updateTotals();
-
     // ----- DOM Elements -----
     const recipeNameInput = document.getElementById("recipeName");
     const designerSelect = document.getElementById("designerSelect");
@@ -42,6 +31,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     const flowerTotalOutput = document.getElementById("flowerTotal");
     const remainingOutput = document.getElementById("remaining");
     const saveRecipeButton = document.getElementById("saveRecipeButton");
+
+    // ----- Initialize arrays AFTER data has loaded -----
+    let flowersData = window.masterFlowers || [];
+    let hardGoodsData = window.masterHardGoods || [];
+    let percentagesData = window.masterPercentages || { greens: 0, wastage: 0, ccfee: 0 };
+    let designersData = window.masterDesigners || [];
+
+    renderDesigners();
+    renderHardGoods();
+    renderFlowers();
+    updateTotals();
+
 
     // ----- State -----
     let flowers = [];
