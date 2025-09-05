@@ -66,12 +66,21 @@
     </section>
 
     <!-- Totals -->
-    <section>
-        <h2>Total Flower Cost: $<span id="flowerTotal">0</span></h2>
-        <h2>Remaining Budget: $<span id="remaining">0</span></h2>
-        <button id="saveRecipeButton" style="display:none;"></button>
+   <section id="totalsSection">
+    <div id="totalsSummary">
+        <div>
+            💰 <strong>Money Spent:</strong> $<span id="flowerTotal">0</span>
+        </div>
+        <div>
+            💵 <strong>Money Remaining:</strong> $<span id="remaining">0</span>
+        </div>
+        <div>
+            <button id="clearButton">Clear All Fields</button>
+            <button id="saveRecipeButton" style="display:none;"></button>
+        </div>
+    </div>
+</section>
 
-    </section>
 </main>
 
     <!-- Scripts -->

@@ -116,23 +116,35 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // ----- Update Totals -----
     function updateTotals() {
-        const flowerTotal = flowers.reduce((sum, f) => sum + (f.price * (f.quantity || 0)), 0);
-        flowerTotalOutput.textContent = flowerTotal.toFixed(2);
+    // ----- Calculate flower total -----
+    const flowerTotal = flowers.reduce((sum, f) => sum + (f.price * (f.quantity || 0)), 0);
 
-        const hardGoodsCost = selectedHardGood.price || 0;
-        const customerPrice = Number(customerPriceInput.value) || 0;
+    // ----- Hard goods -----
+    const hardGoodsCost = selectedHardGood.price || 0;
 
-        const greensValue = (percentagesData.greens / 100) * customerPrice;
-        const wastageValue = (percentagesData.wastage / 100) * customerPrice;
-        const ccfeeValue = (percentagesData.ccfee / 100) * customerPrice;
+    // ----- Customer price -----
+    const customerPrice = Number(customerPriceInput.value) || 0;
 
-        greensInput.value = greensValue.toFixed(2);
-        wastageInput.value = wastageValue.toFixed(2);
-        ccfeeInput.value = ccfeeValue.toFixed(2);
+    // ----- Other percentages / costs -----
+    const greensValue = (percentagesData.greens / 100) * customerPrice;
+    const wastageValue = (percentagesData.wastage / 100) * customerPrice;
+    const ccfeeValue = (percentagesData.ccfee / 100) * customerPrice;
 
-        const totalCosts = flowerTotal + hardGoodsCost + greensValue + wastageValue + ccfeeValue;
-        remainingOutput.textContent = (customerPrice - totalCosts).toFixed(2);
-    }
+    greensInput.value = greensValue.toFixed(2);
+    wastageInput.value = wastageValue.toFixed(2);
+    ccfeeInput.value = ccfeeValue.toFixed(2);
+
+    // ----- Total money spent -----
+    const totalSpent = flowerTotal + hardGoodsCost + greensValue + wastageValue + ccfeeValue;
+
+    // ----- Remaining money -----
+    const remaining = customerPrice - totalSpent;
+
+    // ----- Update DOM -----
+    flowerTotalOutput.textContent = totalSpent.toFixed(2);  // total money spent
+    remainingOutput.textContent = remaining.toFixed(2);    // money remaining
+}
+
 
     // ----- Event Listeners -----
     addFlowerButton.addEventListener("click", () => {
@@ -180,14 +192,28 @@ document.addEventListener("DOMContentLoaded", async () => {
         console.error("Error saving recipe:", err);
         alert("Failed to save recipe. Check console for details.");
     }
+
+
 });
 
+const clearButton = document.getElementById("clearButton");
+
+clearButton.addEventListener("click", () => {
+    // Clear inputs
+    recipeNameInput.value = "";
+    designerSelect.value = "";
+    customerPriceInput.value = 0;
+    greensInput.value = 0;
+    wastageInput.value = 0;
+    ccfeeInput.value = 0;
+
     // ----- Initialize -----
-    flowers.push({ name: "", quantity: 0, price: 0 });
+    flowers = [];
     renderFlowers();
     renderHardGoods();
     renderDesigners();
     updateTotals();
+});
 
     // ----- Live updates from Admin -----
     window.addEventListener("sharedDataChanged", async () => {
