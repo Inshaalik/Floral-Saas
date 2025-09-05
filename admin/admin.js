@@ -1,111 +1,248 @@
+// admin/admin.js
 import { supabase } from "../js/supabaseClient.js";
+import { v4 as uuidv4 } from 'https://jspm.dev/uuid';
 
-// ----- Universal save helper -----
-async function saveItems(table, rows, tenantId, conflictColumns = ["tenant_id", "name"]) {
-  const payload = rows.map(row => ({
-    id: row.id,           // keep id if editing, undefined if new
-    tenant_id: tenantId,
-    ...row
-  }));
+document.addEventListener("DOMContentLoaded", () => {
+    // ----- Local copies -----
+    let flowers = [];
+    let hardGoods = [];
+    let designers = [];
+    let percentages = { id: uuidv4(), greens: 0, wastage: 0, ccfee: 0 };
 
-  const { data, error } = await supabase
-    .from(table)
-    .upsert(payload, { onConflict: conflictColumns.join(",") });
+    // ----- DOM elements -----
+    const flowersTable = document.querySelector("#flowersTable tbody");
+    const hardGoodsTable = document.querySelector("#hardGoodsTable tbody");
+    const designerList = document.querySelector("#designerList");
 
-  if (error) console.error(`Error saving ${table}:`, error.message);
-  else console.log(`${table} saved successfully`, data);
+    const addFlowerButton = document.getElementById("addFlower");
+    const saveFlowersButton = document.getElementById("saveFlowers");
+    const addHardGoodButton = document.getElementById("addHardGood");
+    const saveHardGoodsButton = document.getElementById("saveHardGoods");
+    const savePercentagesButton = document.getElementById("savePercentages");
+    const addDesignerButton = document.getElementById("addDesigner");
+    const saveDesignersButton = document.getElementById("saveDesigners");
+    const newDesignerInput = document.getElementById("newDesigner");
 
-  return data;
-}
+    const greensInput = document.getElementById("greensPercent");
+    const wastageInput = document.getElementById("wastagePercent");
+    const ccfeeInput = document.getElementById("ccfeePercent");
 
-// ----- Create editable row -----
-function createRow(tableBody, fields = {}, rowId = undefined) {
-  const tr = document.createElement("tr");
-  tr.dataset.id = rowId || "";
+    // ----- Render Functions -----
+    function renderFlowers() {
+        flowersTable.innerHTML = "";
+        flowers.forEach((flower, i) => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td><input type="text" data-index="${i}" class="flowerName" value="${flower.name}"></td>
+                <td><input type="number" step="0.01" data-index="${i}" class="flowerWholesale" value="${flower.wholesale || 0}"></td>
+                <td><input type="number" step="0.01" data-index="${i}" class="flowerMarkup" value="${flower.markup || 1}"></td>
+                <td><input type="number" step="0.01" data-index="${i}" class="flowerRetail" value="${flower.retail || 0}"></td>
+                <td><button data-index="${i}" class="removeFlower">Remove</button></td>
+            `;
+            flowersTable.appendChild(row);
+        });
+        addFlowerListeners();
+    }
 
-  Object.keys(fields).forEach(key => {
-    const td = document.createElement("td");
-    const input = document.createElement("input");
-    input.type = typeof fields[key] === "number" ? "number" : "text";
-    input.value = fields[key];
-    input.dataset.field = key;
-    td.appendChild(input);
-    tr.appendChild(td);
-  });
+    function renderHardGoods() {
+        hardGoodsTable.innerHTML = "";
+        hardGoods.forEach((item, i) => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td><input type="text" data-index="${i}" class="hardGoodName" value="${item.name}"></td>
+                <td><input type="number" data-index="${i}" class="hardGoodPrice" value="${item.price}"></td>
+                <td><button data-index="${i}" class="removeHardGood">Remove</button></td>
+            `;
+            hardGoodsTable.appendChild(row);
+        });
+        addHardGoodListeners();
+    }
 
-  // Action column
-  const td = document.createElement("td");
-  const removeBtn = document.createElement("button");
-  removeBtn.textContent = "🗑️";
-  removeBtn.addEventListener("click", () => tr.remove());
-  td.appendChild(removeBtn);
-  tr.appendChild(td);
+    function renderDesigners() {
+        designerList.innerHTML = "";
+        designers.forEach((designer, i) => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td><input type="text" data-index="${i}" class="designerName" value="${designer.name}"></td>
+                <td><button data-index="${i}" class="removeDesigner">Remove</button></td>
+            `;
+            designerList.appendChild(row);
+        });
+        addDesignerListeners();
+    }
 
-  tableBody.appendChild(tr);
-}
+    // ----- Flower listeners (preserve auto-calculations) -----
+    function addFlowerListeners() {
+        document.querySelectorAll(".flowerName").forEach(input => {
+            input.addEventListener("blur", e => {
+                flowers[e.target.dataset.index].name = e.target.value;
+            });
+            input.addEventListener("keydown", e => { if (e.key === "Enter") e.target.blur(); });
+        });
 
-// ----- Setup table helper -----
-function setupTable(tableId, addBtnId, saveBtnId, defaultFields, tableName) {
-  const tableBody = document.querySelector(`#${tableId} tbody`);
-  const addBtn = document.getElementById(addBtnId);
-  const saveBtn = document.getElementById(saveBtnId);
+        document.querySelectorAll(".flowerWholesale").forEach(input => {
+            input.addEventListener("blur", e => {
+                const i = e.target.dataset.index;
+                flowers[i].wholesale = Number(e.target.value) || 0;
+                flowers[i].retail = +(flowers[i].wholesale * flowers[i].markup).toFixed(2);
+                renderFlowers();
+            });
+            input.addEventListener("keydown", e => { if (e.key === "Enter") e.target.blur(); });
+        });
 
-  addBtn.addEventListener("click", () => createRow(tableBody, defaultFields));
+        document.querySelectorAll(".flowerMarkup").forEach(input => {
+            input.addEventListener("blur", e => {
+                const i = e.target.dataset.index;
+                flowers[i].markup = Number(e.target.value) || 1;
+                flowers[i].retail = +(flowers[i].wholesale * flowers[i].markup).toFixed(2);
+                renderFlowers();
+            });
+            input.addEventListener("keydown", e => { if (e.key === "Enter") e.target.blur(); });
+        });
 
-  saveBtn.addEventListener("click", async () => {
-    const tenantId = localStorage.getItem("tenantId");
+        document.querySelectorAll(".flowerRetail").forEach(input => {
+            input.addEventListener("blur", e => {
+                const i = e.target.dataset.index;
+                flowers[i].retail = Number(e.target.value) || 0;
+                flowers[i].markup = flowers[i].wholesale > 0 ? +(flowers[i].retail / flowers[i].wholesale).toFixed(2) : 1;
+                renderFlowers();
+            });
+            input.addEventListener("keydown", e => { if (e.key === "Enter") e.target.blur(); });
+        });
 
-    const rows = Array.from(tableBody.querySelectorAll("tr")).map(tr => {
-      const fields = {};
-      tr.querySelectorAll("input").forEach(input => {
-        fields[input.dataset.field] =
-          input.type === "number" ? parseFloat(input.value) || 0 : input.value;
-      });
-      return { ...fields, id: tr.dataset.id || undefined };
+        document.querySelectorAll(".removeFlower").forEach(btn => {
+            btn.addEventListener("click", e => {
+                flowers.splice(e.target.dataset.index, 1);
+                renderFlowers();
+            });
+        });
+    }
+
+    // ----- Hard goods listeners -----
+    function addHardGoodListeners() {
+        document.querySelectorAll(".hardGoodName").forEach(input => {
+            input.addEventListener("input", e => {
+                hardGoods[e.target.dataset.index].name = e.target.value;
+            });
+        });
+        document.querySelectorAll(".hardGoodPrice").forEach(input => {
+            input.addEventListener("input", e => {
+                hardGoods[e.target.dataset.index].price = Number(e.target.value);
+            });
+        });
+        document.querySelectorAll(".removeHardGood").forEach(btn => {
+            btn.addEventListener("click", e => {
+                hardGoods.splice(e.target.dataset.index, 1);
+                renderHardGoods();
+            });
+        });
+    }
+
+    // ----- Designer listeners -----
+    function addDesignerListeners() {
+        document.querySelectorAll(".designerName").forEach(input => {
+            input.addEventListener("input", e => {
+                designers[e.target.dataset.index].name = e.target.value;
+            });
+        });
+        document.querySelectorAll(".removeDesigner").forEach(btn => {
+            btn.addEventListener("click", e => {
+                designers.splice(e.target.dataset.index, 1);
+                renderDesigners();
+            });
+        });
+    }
+
+    // ----- Buttons -----
+    addFlowerButton.addEventListener("click", () => {
+        flowers.push({ id: uuidv4(), name: "", wholesale: 0, markup: 1, retail: 0 });
+        renderFlowers();
     });
 
-    const saved = await saveItems(tableName, rows, tenantId);
-
-    // Update row ids after save
-    tableBody.querySelectorAll("tr").forEach((tr, i) => {
-      tr.dataset.id = saved[i].id;
+    saveFlowersButton.addEventListener("click", async () => {
+        const tenantId = localStorage.getItem('tenantId');
+        const flowersWithTenant = flowers.map(f => ({ ...f, tenant_id: tenantId }));
+        const { error, data } = await supabase.from("flowers")
+            .upsert(flowersWithTenant, { onConflict: ["tenant_id", "name"] });
+        if (error) return alert("Error saving flowers: " + error.message);
+        flowers = data || [];
+        renderFlowers();
+        alert("Flowers saved!");
     });
 
-    alert(`${tableName} saved successfully!`);
-  });
-}
+    addHardGoodButton.addEventListener("click", () => {
+        hardGoods.push({ id: uuidv4(), name: "", price: 0 });
+        renderHardGoods();
+    });
 
-// ----- Initialize tables -----
-document.addEventListener("DOMContentLoaded", async () => {
-  const tenantId = localStorage.getItem("tenantId");
+    saveHardGoodsButton.addEventListener("click", async () => {
+        const tenantId = localStorage.getItem('tenantId');
+        const hardGoodsWithTenant = hardGoods.map(h => ({ ...h, tenant_id: tenantId }));
+        const { error, data } = await supabase.from("hard_goods")
+            .upsert(hardGoodsWithTenant, { onConflict: ["tenant_id", "name"] });
+        if (error) return alert("Error saving hard goods: " + error.message);
+        hardGoods = data || [];
+        renderHardGoods();
+        alert("Hard goods saved!");
+    });
 
-  // Load existing data
-  const [{ data: flowers = [] }, { data: hardGoods = [] }, { data: designers = [] }] =
-    await Promise.all([
-      supabase.from("flowers").select("*").eq("tenant_id", tenantId),
-      supabase.from("hard_goods").select("*").eq("tenant_id", tenantId),
-      supabase.from("designers").select("*").eq("tenant_id", tenantId)
-    ]);
+    addDesignerButton.addEventListener("click", () => {
+        const name = newDesignerInput.value.trim();
+        if (!name) return;
+        designers.push({ id: uuidv4(), name });
+        newDesignerInput.value = "";
+        renderDesigners();
+    });
 
-  // Render existing rows
-  flowers.forEach(f => createRow(document.querySelector("#flowersTable tbody"), {
-    name: f.name,
-    wholesale: f.wholesale,
-    markup: f.markup,
-    retail: f.retail
-  }, f.id));
+    saveDesignersButton.addEventListener("click", async () => {
+        const tenantId = localStorage.getItem('tenantId');
+        const designersWithTenant = designers.map(d => ({ ...d, tenant_id: tenantId }));
+        const { error, data } = await supabase.from("designers")
+            .upsert(designersWithTenant, { onConflict: ["tenant_id", "name"] });
+        if (error) return alert("Error saving designers: " + error.message);
+        designers = data || [];
+        renderDesigners();
+        alert("Designers saved!");
+    });
 
-  hardGoods.forEach(h => createRow(document.querySelector("#hardGoodsTable tbody"), {
-    name: h.name,
-    price: h.price
-  }, h.id));
+    savePercentagesButton.addEventListener("click", async () => {
+        const tenantId = localStorage.getItem('tenantId');
+        percentages = {
+            ...percentages,
+            tenant_id: tenantId,
+            greens: parseFloat(greensInput.value) || 0,
+            wastage: parseFloat(wastageInput.value) || 0,
+            ccfee: parseFloat(ccfeeInput.value) || 0
+        };
+        const { error } = await supabase.from("percentages")
+            .upsert([percentages], { onConflict: "id" });
+        if (error) return alert("Error saving percentages: " + error.message);
+        alert("Percentages saved!");
+    });
 
-  designers.forEach(d => createRow(document.querySelector("#designerTable tbody"), {
-    name: d.name
-  }, d.id));
+    // ----- Load from Supabase -----
+    async function loadFromSupabase() {
+        const tenantId = localStorage.getItem('tenantId');
 
-  // Setup tables
-  setupTable("flowersTable", "addFlower", "saveFlowers", { name: "", wholesale: 0, markup: 1, retail: 0 }, "flowers");
-  setupTable("hardGoodsTable", "addHardGood", "saveHardGoods", { name: "", price: 0 }, "hard_goods");
-  setupTable("designerTable", "addDesigner", "saveDesigners", { name: "" }, "designers");
+        const { data: flowerData } = await supabase.from("flowers").select("*").eq("tenant_id", tenantId);
+        const { data: hardGoodData } = await supabase.from("hard_goods").select("*").eq("tenant_id", tenantId);
+        const { data: designerData } = await supabase.from("designers").select("*").eq("tenant_id", tenantId);
+        const { data: percData } = await supabase.from("percentages").select("*").eq("tenant_id", tenantId);
+
+        flowers = flowerData || [];
+        hardGoods = hardGoodData || [];
+        designers = designerData || []; // <-- empty until Add Designer clicked
+        percentages = percData?.[0] || { id: uuidv4(), greens: 0, wastage: 0, ccfee: 0 };
+
+        renderFlowers();
+        renderHardGoods();
+        renderDesigners();
+
+        greensInput.value = parseFloat(percentages.greens || 0).toFixed(2);
+        wastageInput.value = parseFloat(percentages.wastage || 0).toFixed(2);
+        ccfeeInput.value = parseFloat(percentages.ccfee || 0).toFixed(2);
+    }
+
+    // ----- Initialize -----
+    loadFromSupabase();
 });
