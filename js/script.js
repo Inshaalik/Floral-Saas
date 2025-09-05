@@ -48,56 +48,36 @@ document.addEventListener("DOMContentLoaded", async () => {
     let selectedHardGood = { name: "", price: 0 };
 
     // ----- Render Functions -----
-    function renderFlowers() {
-        flowerList.innerHTML = "";
-        flowers.forEach((flower, index) => {
-            const row = document.createElement("div");
-            const options = flowersData
-                .map(f => `<option value="${f.name}" ${f.name === flower.name ? "selected" : ""}>${f.name}</option>`)
-                .join("");
-            row.innerHTML = `
-                <select data-index="${index}" class="flowerSelect">
-                    <option value="">--Select Flower--</option>
-                    ${options}
-                </select>
-                Quantity: <input type="number" value="${flower.quantity || 0}" min="0" data-index="${index}" class="quantityInput">
-                Price per Stem: $<span class="priceDisplay">${(flower.price || 0).toFixed(2)}</span>
-                <button data-index="${index}" class="removeButton">Remove</button>
-            `;
-            flowerList.appendChild(row);
-        });
-        addFlowerListeners();
-        updateTotals();
-    }
+   function renderFlowers() {
+    flowerList.innerHTML = "";
+    flowers.forEach((flower, index) => {
+        const row = document.createElement("div");
+        row.classList.add("flower-row");
+        row.innerHTML = `
+            ${flower.name || "--Select Flower--"} 
+            x ${flower.quantity || 0} = $${((flower.price || 0) * (flower.quantity || 0)).toFixed(2)}
+            <button data-index="${index}" class="removeButton">Remove</button>
+        `;
+        flowerList.appendChild(row);
+    });
+    addFlowerListeners();
+    updateTotals();
+}
 
-    function addFlowerListeners() {
-        document.querySelectorAll(".flowerSelect").forEach(select => {
-            select.addEventListener("change", e => {
-                const i = e.target.dataset.index;
-                const flowerName = e.target.value;
-                const master = flowersData.find(f => f.name === flowerName);
-                flowers[i].name = flowerName;
-                flowers[i].price = master ? master.retail : 0; // use retail price
-                renderFlowers();
-            });
-        });
 
-        document.querySelectorAll(".quantityInput").forEach(input => {
-            input.addEventListener("input", e => {
-                const i = e.target.dataset.index;
-                flowers[i].quantity = Number(e.target.value);
-                updateTotals();
-            });
-        });
+   function addFlowerListeners() {
+    // Remove individual input listeners—flowers are selected via prompt now
 
-        document.querySelectorAll(".removeButton").forEach(button => {
-            button.addEventListener("click", e => {
-                const i = e.target.dataset.index;
-                flowers.splice(i, 1);
-                renderFlowers();
-            });
+    // Add remove button listeners
+    document.querySelectorAll(".removeButton").forEach((button, index) => {
+        button.addEventListener("click", () => {
+            flowers.splice(index, 1);  // remove flower from state
+            renderFlowers();           // re-render summary
+            updateTotals();            // recalc totals
         });
-    }
+    });
+}
+
 
     function renderHardGoods() {
         hardGoodsSelect.innerHTML = '<option value="">--Select Hard Good--</option>';
@@ -152,18 +132,30 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
     // ----- Event Listeners -----
-    addFlowerButton.addEventListener("click", () => {
-        flowers.push({ name: "", quantity: 0, price: 0 });
-        renderFlowers();
-    });
+   addFlowerButton.addEventListener("click", () => {
+    // Prompt user to select a flower
+    const flowerOptions = flowersData
+        .map(f => `${f.name} ($${f.retail.toFixed(2)})`)
+        .join("\n");
+    const selectedName = prompt(`Select a flower by typing the name:\n${flowerOptions}`);
+    if (!selectedName) return;
 
-    hardGoodsSelect.addEventListener("change", e => {
-        const selected = hardGoodsData.find(h => h.name === e.target.value);
-        selectedHardGood = selected || { name: "", price: 0 };
-        updateTotals();
-    });
+    const master = flowersData.find(f => f.name.toLowerCase() === selectedName.toLowerCase());
+    if (!master) {
+        alert("Flower not found.");
+        return;
+    }
 
-    [customerPriceInput].forEach(input => input.addEventListener("input", updateTotals));
+    // Prompt for quantity
+    const qty = Number(prompt(`Enter quantity for ${master.name}:`, "1"));
+    if (!qty || qty <= 0) return;
+
+    // Add to state
+    flowers.push({ name: master.name, price: master.retail, quantity: qty });
+
+    // Re-render summary
+    renderFlowers();
+});
 
    saveRecipeButton.addEventListener("click", async () => {
     if (!recipeNameInput.value || !designerSelect.value) {
