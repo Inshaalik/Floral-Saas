@@ -50,12 +50,23 @@
         </select>
     </section>
 
-    <!-- Flowers -->
-    <section>
-        <h2>Flowers</h2>
-        <div id="flowerList"></div>
-        <button id="addFlowerButton">Add Flower</button>
-    </section>
+   <!-- Flowers -->
+<section>
+    <h2>Flowers</h2>
+    
+    <label for="flowerSelect">Select Flower:</label>
+    <input list="flowerOptions" id="flowerSelect" placeholder="Type or pick a flower">
+    <datalist id="flowerOptions">
+        <!-- Options will be populated dynamically by JS -->
+    </datalist>
+
+    <label for="flowerQty">Quantity:</label>
+    <input type="number" id="flowerQty" value="1" min="1">
+
+    <button id="addFlowerButton">Add Flower</button>
+
+    <div id="flowerList"></div>
+</section>
 
     <!-- Other Costs / Percentages -->
     <section>
