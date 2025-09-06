@@ -90,8 +90,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         datalist.innerHTML = "";
         flowersData.forEach(f => {
             const option = document.createElement("option");
-            option.value = f.name;
-            option.textContent = `${f.name} ($${f.retail.toFixed(2)})`;
+            option.value = `${f.name} ($${f.retail.toFixed(2)})`;
             datalist.appendChild(option);
         });
     }
@@ -138,12 +137,12 @@ ccfeeInput.value = ccfeeValue.toFixed(2);
 
     // Flower selection - dropdown + quantity input
     addFlowerButton.addEventListener("click", () => {
-        const selectedName = flowerSelectInput.value.trim();
-        const qty = Number(flowerQtyInput.value);
-        if (!selectedName) {
+        const selectedValue = flowerSelectInput.value.trim();  
+        if (!selectedValue) {
             alert("Please select a flower.");
             return;
         }
+         const qty = Number(flowerQtyInput.value);
         if (!qty || qty <= 0) {
             alert("Please enter a valid quantity.");
             return;
