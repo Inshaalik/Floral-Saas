@@ -142,6 +142,7 @@ ccfeeInput.value = ccfeeValue.toFixed(2);
             alert("Please select a flower.");
             return;
         }
+           const selectedName = selectedValue.split(" ($")[0]; // ✅ Extract just the name
          const qty = Number(flowerQtyInput.value);
         if (!qty || qty <= 0) {
             alert("Please enter a valid quantity.");
