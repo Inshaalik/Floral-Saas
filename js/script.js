@@ -91,6 +91,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         flowersData.forEach(f => {
             const option = document.createElement("option");
             option.value = f.name;
+            option.textContent = `${f.name} ($${f.retail.toFixed(2)})`;
             datalist.appendChild(option);
         });
     }
