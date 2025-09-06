@@ -49,7 +49,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function renderHardGoods() {
         hardGoodsTable.innerHTML = "";
-        hardGoods.forEach((item, i) => {
+        const sortedHardGoods = [...hardGoods].sort((a, b) => a.name.localeCompare(b.name));
+        sortedHardGoods.forEach((item, i) => {
             const row = document.createElement("tr");
             row.innerHTML = `
                 <td><input type="text" data-index="${i}" class="hardGoodName" value="${item.name}"></td>
@@ -63,7 +64,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function renderDesigners() {
         designerList.innerHTML = "";
-        designers.forEach((designer, i) => {
+       const sortedDesigners = [...designers].sort((a, b) => a.name.localeCompare(b.name));
+        sortedDesigners.forEach((designer, i) => {
             const row = document.createElement("tr");
             row.innerHTML = `
                 <td><input type="text" data-index="${i}" class="designerName" value="${designer.name}"></td>

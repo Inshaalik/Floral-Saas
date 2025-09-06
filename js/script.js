@@ -44,7 +44,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // ----- Render Functions -----
     function renderFlowers() {
         flowerList.innerHTML = "";
-        flowers.forEach((flower, index) => {
+        lowers.forEach((flower, index) => {
             const row = document.createElement("div");
             row.classList.add("flower-row");
             row.textContent = `${flower.name} $${flower.price.toFixed(2)} x ${flower.quantity}`;
@@ -67,7 +67,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     function renderHardGoods() {
         hardGoodsSelect.innerHTML = '<option value="">--Select Hard Good--</option>';
-        hardGoodsData.forEach(h => {
+    
+        sortedHardGoodsData.forEach(h => {
             const option = document.createElement("option");
             option.value = h.name;
             option.textContent = `${h.name} ($${h.price || 0})`;
@@ -77,7 +78,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     function renderDesigners() {
         designerSelect.innerHTML = '<option value="">--Select Designer--</option>';
-        designersData.forEach(d => {
+        sortedDesignersData.forEach(d => {
             const option = document.createElement("option");
             option.value = d;
             option.textContent = d;
