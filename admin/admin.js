@@ -190,7 +190,7 @@ document.addEventListener("DOMContentLoaded", () => {
         ...h,
         tenant_id: tenantId
     }));        const { error } = await supabase.from("hard_goods")
-            .upsert(hardGoodsWithTenant, { onConflict: ["tenant_id", "name"] });
+            .upsert(hardGoodsWithTenant, { onConflict: ["id"] });
         if (error) return alert("Error saving hard goods: " + error.message);
 
         const { data } = await supabase.from("hard_goods").select("*").eq("tenant_id", tenantId);
