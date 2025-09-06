@@ -30,9 +30,8 @@ document.addEventListener("DOMContentLoaded", () => {
     // ----- Render Functions -----
     function renderFlowers() {
         flowersTable.innerHTML = "";
-        const sortedFlowers = [...flowers].sort((a, b) => a.name.localeCompare(b.name));
-
-        sortedFlowers.forEach(flower => {
+        // Do NOT sort here, will sort only on save
+        flowers.forEach(flower => {
             const row = document.createElement("tr");
             row.innerHTML = `
                 <td><input type="text" class="flowerName" value="${flower.name}"></td>
@@ -45,22 +44,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
             row.querySelector(".flowerName").addEventListener("blur", e => {
                 flower.name = e.target.value;
-                renderFlowers();
             });
             row.querySelector(".flowerWholesale").addEventListener("blur", e => {
                 flower.wholesale = Number(e.target.value) || 0;
                 flower.retail = +(flower.wholesale * flower.markup).toFixed(2);
-                renderFlowers();
             });
             row.querySelector(".flowerMarkup").addEventListener("blur", e => {
                 flower.markup = Number(e.target.value) || 1;
                 flower.retail = +(flower.wholesale * flower.markup).toFixed(2);
-                renderFlowers();
             });
             row.querySelector(".flowerRetail").addEventListener("blur", e => {
                 flower.retail = Number(e.target.value) || 0;
                 flower.markup = flower.wholesale > 0 ? +(flower.retail / flower.wholesale).toFixed(2) : 1;
-                renderFlowers();
             });
             row.querySelector(".removeFlower").addEventListener("click", () => {
                 flowers = flowers.filter(f => f.id !== flower.id);
@@ -71,9 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function renderHardGoods() {
         hardGoodsTable.innerHTML = "";
-        const sortedHardGoods = [...hardGoods].sort((a, b) => a.name.localeCompare(b.name));
-
-        sortedHardGoods.forEach(item => {
+        hardGoods.forEach(item => {
             const row = document.createElement("tr");
             row.innerHTML = `
                 <td><input type="text" class="hardGoodName" value="${item.name}"></td>
@@ -84,7 +77,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
             row.querySelector(".hardGoodName").addEventListener("input", e => {
                 item.name = e.target.value;
-                renderHardGoods();
             });
             row.querySelector(".hardGoodPrice").addEventListener("input", e => {
                 item.price = Number(e.target.value) || 0;
@@ -98,9 +90,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function renderDesigners() {
         designerList.innerHTML = "";
-        const sortedDesigners = [...designers].sort((a, b) => a.name.localeCompare(b.name));
-
-        sortedDesigners.forEach(designer => {
+        designers.forEach(designer => {
             const row = document.createElement("tr");
             row.innerHTML = `
                 <td><input type="text" class="designerName" value="${designer.name}"></td>
@@ -110,7 +100,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
             row.querySelector(".designerName").addEventListener("input", e => {
                 designer.name = e.target.value;
-                renderDesigners();
             });
             row.querySelector(".removeDesigner").addEventListener("click", () => {
                 designers = designers.filter(d => d.id !== designer.id);
@@ -121,7 +110,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // ----- Buttons -----
     addFlowerButton.addEventListener("click", () => {
-        flowers.push({ id: uuidv4(), name: "", wholesale: 0, markup: 1, retail: 0 });
+        flowers.push({ id: uuidv4(), name: "", wholesale: 0, markup: 3.5, retail: 0 });
         renderFlowers();
     });
 
@@ -147,6 +136,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const { data } = await supabase.from("flowers").select("*").eq("tenant_id", tenantId);
         flowers = data || [];
+        // ✅ Sort on save
+        flowers.sort((a, b) => a.name.localeCompare(b.name));
         renderFlowers();
         alert("Flowers saved!");
     });
@@ -160,6 +151,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const { data } = await supabase.from("hard_goods").select("*").eq("tenant_id", tenantId);
         hardGoods = data || [];
+        hardGoods.sort((a, b) => a.name.localeCompare(b.name));
         renderHardGoods();
         alert("Hard goods saved!");
     });
@@ -173,6 +165,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const { data } = await supabase.from("designers").select("*").eq("tenant_id", tenantId);
         designers = data || [];
+        designers.sort((a, b) => a.name.localeCompare(b.name));
         renderDesigners();
         alert("Designers saved!");
     });
