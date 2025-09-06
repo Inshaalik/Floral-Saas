@@ -184,8 +184,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     saveHardGoodsButton.addEventListener("click", async () => {
         const tenantId = localStorage.getItem('tenantId');
-        const hardGoodsWithTenant = hardGoods.map(h => ({ ...h, tenant_id: tenantId }));
-        const { error } = await supabase.from("hard_goods")
+           // Ensure every row has an id
+    const hardGoodsWithTenant = hardGoods.map(h => ({
+        id: h.id || uuidv4(), // generate new id if missing
+        ...h,
+        tenant_id: tenantId
+    }));        const { error } = await supabase.from("hard_goods")
             .upsert(hardGoodsWithTenant, { onConflict: ["tenant_id", "name"] });
         if (error) return alert("Error saving hard goods: " + error.message);
 
