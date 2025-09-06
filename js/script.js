@@ -106,9 +106,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     const ccfeeValue = (percentagesData.ccfee / 100) * customerPrice;
 
     // Only display greens
-    greensInput.value = greensValue.toFixed(2);
-    wastageInput.value = ""; // hidden / not displayed
-    ccfeeInput.value = "";   // hidden / not displayed
+  // Greens is now a <span>, not an <input>
+document.getElementById("greens").textContent = greensValue.toFixed(2);
+
+// Wastage + CC Fee are hidden <input>s, keep them as values
+wastageInput.value = wastageValue.toFixed(2);
+ccfeeInput.value = ccfeeValue.toFixed(2);
 
     const totalSpent = flowerTotal + hardGoodsCost + greensValue + wastageValue + ccfeeValue;
     const remaining = customerPrice - totalSpent;
@@ -173,7 +176,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 flowers: flowers.map(f => ({ name: f.name, quantity: f.quantity, price: f.price })),
                 hardGoods: selectedHardGood.name ? [{ name: selectedHardGood.name, price: selectedHardGood.price }] : [],
                 percentages: {
-                    greens: Number(greensInput.value),
+                     greens: Number(document.getElementById("greens").textContent), // from <span>
                     wastage: Number(wastageInput.value),
                     ccfee: Number(ccfeeInput.value)
                 }
@@ -196,7 +199,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         recipeNameInput.value = "";
         designerSelect.value = "";
         customerPriceInput.value = 0;
-        greensInput.value = 0;
+        document.getElementById("greens").textContent = "0.00";
+
         wastageInput.value = 0;
         ccfeeInput.value = 0;
 

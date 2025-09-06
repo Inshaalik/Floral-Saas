@@ -27,45 +27,50 @@
 <main class="calculator-grid">
     <!-- Recipe Info -->
     <section class="recipe">
-        <h2>Recipe Name</h2>
+        <h2>Recipe</h2>
         <input type="text" id="recipeName" placeholder="Enter recipe name">
 
         <label>Customer Price: $<input type="number" id="customerPrice" value="0"></label>
-        <label>Greens: $<input type="number" id="greens" value="0"></label>
       
+          <div>
+        <strong>Greens:</strong> $<span id="greens">0</span>
+      </div>
+      <!-- Hidden but still computed -->
+      <input type="hidden" id="wastage" value="0">
+      <input type="hidden" id="ccfee" value="0">
     </section>
 
-    <!-- Customer Price + Percentages -->
-    <section class="customer-percentages">
-        
-          <h2>Designer</h2>
-        <select id="designerSelect">
-            <option value="">--Select Designer--</option>
+ <!-- Column 2: Designer + Hard Goods -->
+    <section class="designer-hardgoods">
+      <h2>Designer</h2>
+      <select id="designerSelect">
+        <option value="">--Select Designer--</option>
+      </select>
 
-         <h2>Hard Goods</h2>
-        <select id="hardGoodsSelect">
-            <option value="">--Select Hard Good--</option>
-        </select>
-
-        </select><label>Wastage: $<input type="hidden" id="wastage" value="0"></label>
-        <label>CC Fee: $<input type="hidden" id="ccfee" value="0"></label>
+      <h2>Hard Goods</h2>
+      <select id="hardGoodsSelect">
+        <option value="">--Select Hard Good--</option>
+      </select>
     </section>
 
-
-
-    <!-- Flowers (right column) -->
+    <!-- Column 3: Flowers -->
     <section class="flowers">
-        <h2>Flowers</h2>
-        <label for="flowerSelect">Select Flower:</label>
-        <input list="flowerOptions" id="flowerSelect" placeholder="Type or pick a flower">
-        <datalist id="flowerOptions"></datalist>
+      <div class="totals-top">
+        💰 <strong>Spent:</strong> $<span id="flowerTotal">0</span><br>
+        💵 <strong>Remaining:</strong> $<span id="remaining">0</span>
+      </div>
 
-        <label for="flowerQty">Quantity:</label>
-        <input type="number" id="flowerQty" value="1" min="1">
+      <h2>Flowers</h2>
+      <label for="flowerSelect">Select Flower:</label>
+      <input list="flowerOptions" id="flowerSelect" placeholder="Type or pick a flower">
+      <datalist id="flowerOptions"></datalist>
 
-        <button id="addFlowerButton">Add Flower</button>
+      <label for="flowerQty">Quantity:</label>
+      <input type="number" id="flowerQty" value="0" min="0">
 
-        <div id="flowerList"></div>
+      <button id="addFlowerButton">Add Flower</button>
+
+      <div id="flowerList"></div>
     </section>
 
     <!-- Totals -->
