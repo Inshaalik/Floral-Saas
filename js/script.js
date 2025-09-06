@@ -153,7 +153,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         flowers.push({ name: master.name, price: master.retail, quantity: qty });
         flowerSelectInput.value = "";
-        flowerQtyInput.value = 1;
+        flowerQtyInput.value = 0;
         renderFlowers();
     });
 

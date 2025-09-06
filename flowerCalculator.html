@@ -30,28 +30,28 @@
         <h2>Recipe Name</h2>
         <input type="text" id="recipeName" placeholder="Enter recipe name">
 
-        <h2>Designer</h2>
-        <select id="designerSelect">
-            <option value="">--Select Designer--</option>
-        </select>
+        <label>Customer Price: $<input type="number" id="customerPrice" value="0"></label>
+        <label>Greens: $<input type="number" id="greens" value="0"></label>
+      
     </section>
 
     <!-- Customer Price + Percentages -->
     <section class="customer-percentages">
-        <h2>Customer Price & Costs</h2>
-        <label>Customer Price: $<input type="number" id="customerPrice" value="0"></label>
-        <label>Greens: $<input type="number" id="greens" value="0"></label>
-        <label>Wastage: $<input type="number" id="wastage" value="0"></label>
-        <label>CC Fee: $<input type="number" id="ccfee" value="0"></label>
-    </section>
+        
+          <h2>Designer</h2>
+        <select id="designerSelect">
+            <option value="">--Select Designer--</option>
 
-    <!-- Hard Goods -->
-    <section class="hardgoods">
-        <h2>Hard Goods</h2>
+         <h2>Hard Goods</h2>
         <select id="hardGoodsSelect">
             <option value="">--Select Hard Good--</option>
         </select>
+
+        </select><label>Wastage: $<input type="hidden" id="wastage" value="0"></label>
+        <label>CC Fee: $<input type="hidden" id="ccfee" value="0"></label>
     </section>
+
+
 
     <!-- Flowers (right column) -->
     <section class="flowers">
