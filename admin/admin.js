@@ -28,41 +28,56 @@ document.addEventListener("DOMContentLoaded", () => {
     const ccfeeInput = document.getElementById("ccfeePercent");
 
     // ----- Render Functions -----
-    function renderFlowers() {
-        flowersTable.innerHTML = "";
-        // Do NOT sort here, will sort only on save
-        flowers.forEach(flower => {
-            const row = document.createElement("tr");
-            row.innerHTML = `
-                <td><input type="text" class="flowerName" value="${flower.name}"></td>
-                <td><input type="number" step="0.01" class="flowerWholesale" value="${flower.wholesale || 0}"></td>
-                <td><input type="number" step="0.01" class="flowerMarkup" value="${flower.markup || 1}"></td>
-                <td><input type="number" step="0.01" class="flowerRetail" value="${flower.retail || 0}"></td>
-                <td><button class="removeFlower">Remove</button></td>
-            `;
-            flowersTable.appendChild(row);
+function renderFlowers() {
+    flowersTable.innerHTML = "";
+    // Do NOT sort here, sorting happens only on save
+    flowers.forEach(flower => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td><input type="text" class="flowerName" value="${flower.name}"></td>
+            <td><input type="number" step="0.01" class="flowerWholesale" value="${flower.wholesale || 0}"></td>
+            <td><input type="number" step="0.01" class="flowerMarkup" value="${flower.markup || 1}"></td>
+            <td><input type="number" step="0.01" class="flowerRetail" value="${flower.retail || 0}" readonly></td>
+            <td><button class="removeFlower">Remove</button></td>
+        `;
+        flowersTable.appendChild(row);
 
-            row.querySelector(".flowerName").addEventListener("blur", e => {
-                flower.name = e.target.value;
-            });
-            row.querySelector(".flowerWholesale").addEventListener("blur", e => {
-                flower.wholesale = Number(e.target.value) || 0;
-                flower.retail = +(flower.wholesale * flower.markup).toFixed(2);
-            });
-            row.querySelector(".flowerMarkup").addEventListener("blur", e => {
-                flower.markup = Number(e.target.value) || 1;
-                flower.retail = +(flower.wholesale * flower.markup).toFixed(2);
-            });
-            row.querySelector(".flowerRetail").addEventListener("blur", e => {
-                flower.retail = Number(e.target.value) || 0;
-                flower.markup = flower.wholesale > 0 ? +(flower.retail / flower.wholesale).toFixed(2) : 1;
-            });
-            row.querySelector(".removeFlower").addEventListener("click", () => {
-                flowers = flowers.filter(f => f.id !== flower.id);
-                renderFlowers();
-            });
+        const wholesaleInput = row.querySelector(".flowerWholesale");
+        const markupInput = row.querySelector(".flowerMarkup");
+        const retailInput = row.querySelector(".flowerRetail");
+
+        // Name
+        row.querySelector(".flowerName").addEventListener("blur", e => {
+            flower.name = e.target.value;
         });
-    }
+
+        // Wholesale input updates retail live
+        wholesaleInput.addEventListener("input", e => {
+            flower.wholesale = Number(e.target.value) || 0;
+            flower.retail = +(flower.wholesale * flower.markup).toFixed(2);
+            retailInput.value = flower.retail;
+        });
+
+        // Markup input updates retail live
+        markupInput.addEventListener("input", e => {
+            flower.markup = Number(e.target.value) || 1;
+            flower.retail = +(flower.wholesale * flower.markup).toFixed(2);
+            retailInput.value = flower.retail;
+        });
+
+        // Retail input updates markup live
+        retailInput.addEventListener("input", e => {
+            flower.retail = Number(e.target.value) || 0;
+            flower.markup = flower.wholesale > 0 ? +(flower.retail / flower.wholesale).toFixed(2) : 1;
+            markupInput.value = flower.markup;
+        });
+
+        row.querySelector(".removeFlower").addEventListener("click", () => {
+            flowers = flowers.filter(f => f.id !== flower.id);
+            renderFlowers(); // Only remove triggers full render
+        });
+    });
+}
 
     function renderHardGoods() {
         hardGoodsTable.innerHTML = "";
