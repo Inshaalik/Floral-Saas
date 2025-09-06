@@ -78,8 +78,10 @@ button:hover {
   top: 24px;
   right: 24px;
   display: flex;
-  gap: 16px;
-  z-index: 10;
+  gap: 8px;
+  max-width: 220px;
+  flex-wrap: wrap;
+
 }
 
 .totals div {
