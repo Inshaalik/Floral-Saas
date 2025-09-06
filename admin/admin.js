@@ -30,7 +30,10 @@ document.addEventListener("DOMContentLoaded", () => {
     // ----- Render Functions -----
     function renderFlowers() {
         flowersTable.innerHTML = "";
-        flowers.forEach((flower, i) => {
+            // 🔹 Sort alphabetically by name
+    const sortedFlowers = [...flowers].sort((a, b) => a.name.localeCompare(b.name));
+
+    sortedFlowers.forEach((flower, i) => {
             const row = document.createElement("tr");
             row.innerHTML = `
                 <td><input type="text" data-index="${i}" class="flowerName" value="${flower.name}"></td>
