@@ -154,7 +154,7 @@ section.recipe { grid-area: recipe; }
 section.customer { grid-area: customer; }
 section.hardgoods { grid-area: hardgoods; }
 section.percentages { grid-area: percentages; }
-section.totals { grid-area: totals; }
+section.totals { height: auto; min-height: 0;
 section.flowers { grid-area: flowers; }
 
 
