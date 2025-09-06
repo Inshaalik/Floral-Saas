@@ -137,14 +137,13 @@ button:hover {
     "hardgoods percentages flowers"
     "totals totals flowers";
   grid-template-columns: 1fr 1fr 1.5fr; /* 2 smaller columns + wider flower list */
-  grid-template-rows: auto auto min-content; /* totals row is only as tall as content */
   grid-gap: 1.25rem;
   max-width: 1200px;
   margin: 0 auto;
 }
 
 section {
-  /* remove height:100% to avoid forcing sections to stretch */
+  height: 100%; /* prevent stretching mismatch */
 }
 
 /* Assign areas */
@@ -152,14 +151,7 @@ section.recipe { grid-area: recipe; }
 section.customer { grid-area: customer; }
 section.hardgoods { grid-area: hardgoods; }
 section.percentages { grid-area: percentages; }
-section.totals { 
-  grid-area: totals; 
-  display: flex; 
-  justify-content: flex-start; /* or space-between if you want spread */
-  align-items: center;
-  background: transparent; /* remove giant colored box */
-  padding: 0; /* optional: remove extra padding */
-}
+section.totals { grid-area: totals; }
 section.flowers { grid-area: flowers; }
 
 
@@ -228,3 +220,72 @@ section:focus-within {
     gap: 0.75rem;
   }
 }
+/* ---------- Compact Inputs & Selects ---------- */
+input[type="text"],
+input[type="number"],
+select {
+  width: auto;           /* shrink to content / container constraints */
+  max-width: 300px;      /* optional: cap width */
+  padding: 6px 10px;     /* smaller padding */
+  font-size: 14px;       /* slightly smaller font */
+  margin-top: 4px;
+  margin-bottom: 8px;
+}
+
+/* ---------- Compact Buttons ---------- */
+button {
+  padding: 6px 12px;     /* smaller buttons */
+  font-size: 14px;
+  border-radius: 6px;
+}
+
+/* ---------- Admin Table Compactness ---------- */
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;       /* smaller font */
+  margin-bottom: 1rem;
+}
+
+.admin-table th,
+.admin-table td {
+  padding: 6px 10px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.admin-table th {
+  background-color: #f7f7f7;
+  font-weight: 600;
+}
+
+.admin-table tr:hover {
+  background-color: #f1f1f1;
+}
+
+/* Scrollable table container to prevent huge tables */
+.table-container {
+  max-height: 400px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 4px;
+}
+
+/* ---------- Compact Totals Box ---------- */
+.totals div {
+  min-width: 100px; /* slightly smaller */
+  padding: 8px 14px;
+  font-size: 14px;
+}
+
+/* ---------- Compact Flower List ---------- */
+#flowerList {
+  max-height: 180px;      /* smaller height */
+  padding: 8px;           /* smaller padding */
+}
+
+#flowerList .flower-row {
+  padding: 4px 0;         /* less vertical space */
+}
+
