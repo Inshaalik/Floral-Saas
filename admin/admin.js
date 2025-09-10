@@ -146,7 +146,7 @@ function renderFlowers() {
         const tenantId = localStorage.getItem("tenantId");
         const flowersWithTenant = flowers.map(f => ({ ...f, tenant_id: tenantId }));
         const { error } = await supabase.from("flowers")
-            .upsert(flowersWithTenant, { onConflict: ["tenant_id", "name"] });
+            .upsert(flowersWithTenant, { onConflict: ["id"] });
         if (error) return alert("Error saving flowers: " + error.message);
 
         const { data } = await supabase.from("flowers").select("*").eq("tenant_id", tenantId);
@@ -161,7 +161,7 @@ function renderFlowers() {
         const tenantId = localStorage.getItem("tenantId");
         const hardGoodsWithTenant = hardGoods.map(h => ({ ...h, tenant_id: tenantId }));
         const { error } = await supabase.from("hard_goods")
-            .upsert(hardGoodsWithTenant, { onConflict: ["tenant_id", "name"] });
+            .upsert(hardGoodsWithTenant, { onConflict: ["id"] });
         if (error) return alert("Error saving hard goods: " + error.message);
 
         const { data } = await supabase.from("hard_goods").select("*").eq("tenant_id", tenantId);
@@ -175,7 +175,7 @@ function renderFlowers() {
         const tenantId = localStorage.getItem("tenantId");
         const designersWithTenant = designers.map(d => ({ ...d, tenant_id: tenantId }));
         const { error } = await supabase.from("designers")
-            .upsert(designersWithTenant, { onConflict: ["tenant_id", "name"] });
+            .upsert(designersWithTenant, { onConflict: ["id"] });
         if (error) return alert("Error saving designers: " + error.message);
 
         const { data } = await supabase.from("designers").select("*").eq("tenant_id", tenantId);
