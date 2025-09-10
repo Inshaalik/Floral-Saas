@@ -37,7 +37,7 @@ function renderFlowers() {
             <td><input type="text" class="flowerName" value="${flower.name}"></td>
             <td><input type="number" step="0.01" class="flowerWholesale" value="${flower.wholesale || 0}"></td>
             <td><input type="number" step="0.01" class="flowerMarkup" value="${flower.markup || 1}"></td>
-            <td><input type="number" step="0.01" class="flowerRetail" value="${flower.retail || 0}" readonly></td>
+            <td><input type="number" step="0.01" class="flowerRetail" value="${flower.retail || 0}"></td>
             <td><button class="removeFlower">Remove</button></td>
         `;
         flowersTable.appendChild(row);
