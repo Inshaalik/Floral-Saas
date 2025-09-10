@@ -60,22 +60,33 @@ function renderFlowers() {
 
         // Markup input updates retail live
         markupInput.addEventListener("input", e => {
-            flower.markup = Number(e.target.value) || 1;
-            flower.retail = +(flower.wholesale * flower.markup).toFixed(2);
-            retailInput.value = flower.retail;
-        });
+          flower.markup = Number(e.target.value) || 1;
+
+    if (flower.wholesale > 0) {
+        // Normal: update retail
+        flower.retail = +(flower.wholesale * flower.markup).toFixed(2);
+        retailInput.value = flower.retail;
+    } else if (flower.retail > 0) {
+        // New: calculate wholesale if retail exists
+        flower.wholesale = +(flower.retail / flower.markup).toFixed(2);
+        wholesaleInput.value = flower.wholesale;
+    }
+});
 
         // Retail input updates markup live
         retailInput.addEventListener("input", e => {
-            flower.retail = Number(e.target.value) || 0;
-            flower.markup = flower.wholesale > 0 ? +(flower.retail / flower.wholesale).toFixed(2) : 1;
-            markupInput.value = flower.markup;
-        });
+           flower.retail = Number(e.target.value) || 0;
 
-        row.querySelector(".removeFlower").addEventListener("click", () => {
-            flowers = flowers.filter(f => f.id !== flower.id);
-            renderFlowers(); // Only remove triggers full render
-        });
+    if (flower.wholesale > 0) {
+        // Normal: update markup
+        flower.markup = flower.wholesale > 0 ? +(flower.retail / flower.wholesale).toFixed(2) : 1;
+        markupInput.value = flower.markup;
+    } else if (flower.markup > 0) {
+        // New: calculate wholesale if markup exists
+        flower.wholesale = +(flower.retail / flower.markup).toFixed(2);
+        wholesaleInput.value = flower.wholesale;
+    }
+});
     });
 }
 
