@@ -98,7 +98,6 @@ row.querySelector(".removeFlower").addEventListener("click", async () => {
         .from("flowers")
         .delete()
         .eq("id", flower.id); // make sure flower.id exists in your array
-    
     if (error) {
         console.error("Error deleting flower:", error);
         alert("Could not delete flower");
@@ -108,7 +107,6 @@ row.querySelector(".removeFlower").addEventListener("click", async () => {
 
     // 2. Remove from local array
     flowers = flowers.filter(f => f.id !== flower.id);
-
     // 3. Re-render table
     renderFlowers();
         
@@ -253,18 +251,13 @@ row.querySelector(".removeFlower").addEventListener("click", async () => {
         const tenantId = localStorage.getItem('tenantId');
 
         const { data: flowerData } = await supabase.from("flowers").select("*").eq("tenant_id", tenantId);
-        console.log('Loaded flowers:', flowerData);
-        
         
         const { data: hardGoodData } = await supabase.from("hard_goods").select("*").eq("tenant_id", tenantId);
-        console.log('Loaded hard goods:', hardGoodData);
         
         const { data: designerData } = await supabase.from("designers").select("*").eq("tenant_id", tenantId);
-        console.log('Loaded designers:', designerData);
         
         const { data: percData } = await supabase.from("percentages").select("*").eq("tenant_id", tenantId);
-        console.log('Loaded percentages:', percData);
-
+        
         flowers = flowerData || [];
         hardGoods = hardGoodData || [];
         designers = designerData || [];
