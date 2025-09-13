@@ -180,6 +180,7 @@ saveFlowersButton.addEventListener("click", async () => {
 
     // 1️⃣ Delete removed flowers from Supabase first
     if (deletedFlowerIds.length > 0) {
+        console.log("Deleting flowers with IDs:", deletedFlowerIds);
         const { error: deleteError } = await supabase
             .from("flowers")
             .delete()
@@ -193,6 +194,7 @@ saveFlowersButton.addEventListener("click", async () => {
     }
 
     // 2️⃣ Upsert remaining flowers
+    console.log("Upserting flowers:", flowersToSave);
     const flowersToSave = flowers.map(f => ({ ...f, tenant_id: tenantId }));
     const { error: upsertError } = await supabase
         .from("flowers")
