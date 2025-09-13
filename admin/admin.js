@@ -194,8 +194,9 @@ saveFlowersButton.addEventListener("click", async () => {
     }
 
     // 2️⃣ Upsert remaining flowers
-    console.log("Upserting flowers:", flowersToSave);
     const flowersToSave = flowers.map(f => ({ ...f, tenant_id: tenantId }));
+     console.log("Upserting flowers:", flowersToSave);
+   
     const { error: upsertError } = await supabase
         .from("flowers")
         .upsert(flowersToSave, { onConflict: ["id"] });
