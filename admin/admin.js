@@ -92,8 +92,9 @@ row.querySelector(".removeFlower").addEventListener("click", async () => {
     // Confirm delete
     if (!confirm(`Remove ${flower.name}?`)) return;
 
-    // 1. Delete from Supabase
-    const { error } = await supabase
+    // 1. Delete directly from Supabase
+    if (flower.id) {
+        const { error } = await supabase
         .from("flowers")
         .delete()
         .eq("id", flower.id); // make sure flower.id exists in your array
