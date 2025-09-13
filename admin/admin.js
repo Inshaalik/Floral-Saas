@@ -94,16 +94,20 @@ row.querySelector(".removeFlower").addEventListener("click", async () => {
 
     // 1. Delete directly from Supabase
     if (flower.id) {
+        const tenantId = localStorage.getItem('tenantId');
         console.log("Deleting flower with ID:", flower.id);
+
         const { error } = await supabase
         .from("flowers")
         .delete()
         .eq("id", flower.id); // make sure flower.id exists in your array
+        .eq("tenant_id", tenantId);
     if (error) {
         console.error("Error deleting flower:", error);
         alert("Could not delete flower");
         return;
     }
+    console.log("Flower deleted successfully");
  }
 
     // 2. Remove from local array
