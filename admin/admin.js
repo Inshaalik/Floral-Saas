@@ -104,6 +104,7 @@ row.querySelector(".removeFlower").addEventListener("click", async () => {
         alert("Could not delete flower");
         return;
     }
+    }
 
     // 2. Remove from local array
     flowers = flowers.filter(f => f.id !== flower.id);
