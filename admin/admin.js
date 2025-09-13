@@ -89,26 +89,21 @@ function renderFlowers() {
     }
 });
 
-// Remove button handler
 row.querySelector(".removeFlower").addEventListener("click", () => {
-  if (!confirm(`Remove ${flower.name || 'this flower'}?`)) return;
+    if (!confirm(`Remove ${flower.name || 'this flower'}?`)) return;
 
-  if (flower.id) {
-    // Existing flower from DB
-    if (!deletedFlowerIds.includes(flower.id)) {
-      deletedFlowerIds.push(flower.id);
+    // Track deleted flower IDs (existing flowers)
+    if (flower.id && !deletedFlowerIds.includes(flower.id)) {
+        deletedFlowerIds.push(flower.id);
     }
-    // remove from array by ID
+
+    // Remove from local array (all flowers have unique id)
     flowers = flowers.filter(f => f.id !== flower.id);
-  } else {
-    // New unsaved flower with no id — remove by reference
-    flowers = flowers.filter(f => f !== flower && f.id !== flower.id);
-  }
 
-  console.log("flowers array after remove:", flowers); // Debug
-  console.log("deletedFlowerIds array:", deletedFlowerIds); // Debug
+    console.log("flowers array after remove:", flowers);
+    console.log("deletedFlowerIds array:", deletedFlowerIds);
 
-  renderFlowers();
+    renderFlowers();
 });
 
     });  
@@ -190,18 +185,24 @@ saveFlowersButton.addEventListener("click", async () => {
             .delete()
             .in("id", deletedFlowerIds)
             .eq("tenant_id", tenantId);
-        if (deleteError) {
-            alert("Error deleting flowers: " + deleteError.message);
-            return;
-        }
-        deletedFlowerIds = []; // reset after successful deletion
+        if (deleteError) 
+            return alert("Error deleting flowers: " + deleteError.message);
+            
+         deletedFlowerIds = []; // reset after successful deletion
     }
     
 
     // 2️⃣ Upsert remaining flowers
 
-    const flowersToSave = flowers.map(f => ({ ...f, tenant_id: tenantId }));
-     console.log("Upserting flowers:", flowersToSave);
+    const flowersToSave = flowers.map(f => ({ 
+        id: f.id || uuidv4(),
+        name: f.name,
+        wholesale: f.wholesale || 0,
+        markup: f.markup || 1,
+        retail: f.retail || 0,
+        tenant_id: tenantId
+         }));
+              console.log("Upserting flowers:", flowersToSave);
    
     const { error: upsertError } = await supabase
         .from("flowers")
