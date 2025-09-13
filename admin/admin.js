@@ -90,22 +90,26 @@ function renderFlowers() {
 });
 
 // Remove button handler
-row.querySelector(".removeFlower").addEventListener("click", async () => {
-    // Confirm delete
-    if (!confirm(`Remove ${flower.name || 'this flower'}?`)) return;
+row.querySelector(".removeFlower").addEventListener("click", () => {
+  if (!confirm(`Remove ${flower.name || 'this flower'}?`)) return;
 
-     // 1️⃣ Track deleted flower ID (only once)
-    if (flower.id && !deletedFlowerIds.includes(flower.id)) {
-        deletedFlowerIds.push(flower.id);
+  if (flower.id) {
+    // Existing flower from DB
+    if (!deletedFlowerIds.includes(flower.id)) {
+      deletedFlowerIds.push(flower.id);
     }
-
-
-    // 2️⃣ Remove from local array
+    // remove from array by ID
     flowers = flowers.filter(f => f.id !== flower.id);
+  } else {
+    // New unsaved flower with no id — remove by reference
+    flowers = flowers.filter(f => f !== flower);
+  }
 
-    // 3️⃣ Re-render table
-    renderFlowers();
-    });
+  console.log("flowers array after remove:", flowers); // Debug
+  console.log("deletedFlowerIds array:", deletedFlowerIds); // Debug
+
+  renderFlowers();
+});
 
     });  
 
@@ -192,8 +196,10 @@ saveFlowersButton.addEventListener("click", async () => {
         }
         deletedFlowerIds = []; // reset after successful deletion
     }
+    
 
     // 2️⃣ Upsert remaining flowers
+
     const flowersToSave = flowers.map(f => ({ ...f, tenant_id: tenantId }));
      console.log("Upserting flowers:", flowersToSave);
    
