@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let hardGoods = [];
     let designers = [];
     let percentages = { id: uuidv4(), greens: 0, wastage: 0, ccfee: 0 };
+    let deletedFlowerIds = [];
 
     // ----- DOM elements -----
     const flowersTable = document.querySelector("#flowersTable tbody");
@@ -87,18 +88,16 @@ function renderFlowers() {
         wholesaleInput.value = flower.wholesale;
     }
 });
-// ----- Array to track deleted flowers -----
-let deletedFlowerIds = [];
 
 // Remove button handler
 row.querySelector(".removeFlower").addEventListener("click", async () => {
     // Confirm delete
     if (!confirm(`Remove ${flower.name || 'this flower'}?`)) return;
 
-    // 1️⃣ Track deleted flower ID (for save button to handle actual deletion)
-if (flower.id) {
-    deletedFlowerIds.push(flower.id);
-}
+     // 1️⃣ Track deleted flower ID (only once)
+    if (flower.id && !deletedFlowerIds.includes(flower.id)) {
+        deletedFlowerIds.push(flower.id);
+    }
 
 
     // 2️⃣ Remove from local array
@@ -175,8 +174,6 @@ if (flower.id) {
         renderDesigners();
     });
 
-    // ----- Keep track of deleted flowers -----
-let deletedFlowerIds = [];
 
 saveFlowersButton.addEventListener("click", async () => {
     const tenantId = localStorage.getItem("tenantId");
