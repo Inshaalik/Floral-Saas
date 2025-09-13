@@ -190,7 +190,7 @@ row.querySelector(".removeFlower").addEventListener("click", async () => {
         const { data } = await supabase.from("flowers").select("*").eq("tenant_id", tenantId);
         flowers = data || [];
         // ✅ Sort on save
-        flowers.sort((a, b) => a.name.localeCompare(b.name));
+        flowers.sort((a, b) => a.name.localeCompare(b.name || ""));
         renderFlowers();
         alert("Flowers saved!");
     });
@@ -204,7 +204,7 @@ row.querySelector(".removeFlower").addEventListener("click", async () => {
 
         const { data } = await supabase.from("hard_goods").select("*").eq("tenant_id", tenantId);
         hardGoods = data || [];
-        hardGoods.sort((a, b) => a.name.localeCompare(b.name));
+        hardGoods.sort((a, b) => a.name.localeCompare(b.name || ""));
         renderHardGoods();
         alert("Hard goods saved!");
     });
@@ -218,7 +218,7 @@ row.querySelector(".removeFlower").addEventListener("click", async () => {
 
         const { data } = await supabase.from("designers").select("*").eq("tenant_id", tenantId);
         designers = data || [];
-        designers.sort((a, b) => a.name.localeCompare(b.name));
+        designers.sort((a, b) => a.name.localeCompare(b.name || ""));
         renderDesigners();
         alert("Designers saved!");
     });
