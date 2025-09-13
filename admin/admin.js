@@ -90,10 +90,11 @@ function renderFlowers() {
 // Remove button handler
 row.querySelector(".removeFlower").addEventListener("click", async () => {
     // Confirm delete
-    if (!confirm(`Remove ${flower.name}?`)) return;
+    if (!confirm(`Remove ${flower.name || 'this flower'}?`)) return;
 
     // 1. Delete directly from Supabase
     if (flower.id) {
+        console.log("Deleting flower with ID:", flower.id);
         const { error } = await supabase
         .from("flowers")
         .delete()
@@ -102,7 +103,7 @@ row.querySelector(".removeFlower").addEventListener("click", async () => {
         console.error("Error deleting flower:", error);
         alert("Could not delete flower");
         return;
-}
+    }
  }
 
     // 2. Remove from local array
