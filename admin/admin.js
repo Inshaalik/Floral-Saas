@@ -93,12 +93,12 @@ row.querySelector(".removeFlower").addEventListener("click", () => {
     if (!confirm(`Remove ${flower.name || 'this flower'}?`)) return;
 
     // Track deleted flower IDs (existing flowers)
-    if (flower.id && !deletedFlowerIds.includes(flower.id) && flower.name.trim() !== "") {
+    if (flower.id && !deletedFlowerIds.includes(flower.id)) {
         deletedFlowerIds.push(flower.id);
     }
 
     // Remove from local array (all flowers have unique id)
-    flowers = flowers.filter(f => f !== flower);
+    flowers = flowers.filter(f => f.id !== flower.id);
 
     console.log("flowers array after remove:", flowers);
     console.log("deletedFlowerIds array:", deletedFlowerIds);
@@ -191,14 +191,16 @@ saveFlowersButton.addEventListener("click", async () => {
     }
     // 2️⃣ Upsert remaining flowers
     const flowersToSave = flowers
-    .filter(f => f.id && f.name.trim() !== "")
-    .map(f => ({ ...f, tenant_id: tenantId }));
+    .filter(f => f.name.trim() !== "")
+    .map(f => ({ ...f, tenant_id: tenantId, id: f.id || uuidv4() })); // assign new UUID if no id
               console.log("Upserting flowers:", flowersToSave);
+     if (flowersToSave.length > 0) {       
     const { error: upsertError } = await supabase
         .from("flowers")
         .upsert(flowersToSave, { onConflict: ["id"] });
     if (upsertError) {
         return alert("Error saving flowers: " + upsertError.message);
+    }
     }
     // 3️⃣ Re-fetch and render to make sure local state is correct
     const { data } = await supabase.from("flowers").select("*").eq("tenant_id", tenantId);
