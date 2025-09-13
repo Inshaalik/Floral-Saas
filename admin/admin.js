@@ -111,10 +111,11 @@ row.querySelector(".removeFlower").addEventListener("click", async () => {
 
     // 3. Re-render table
     renderFlowers();
+    
 });
+    }
 
-    });
-}
+
 
     function renderHardGoods() {
         hardGoodsTable.innerHTML = "";
