@@ -102,7 +102,7 @@ row.querySelector(".removeFlower").addEventListener("click", () => {
     flowers = flowers.filter(f => f.id !== flower.id);
   } else {
     // New unsaved flower with no id — remove by reference
-    flowers = flowers.filter(f => f !== flower);
+    flowers = flowers.filter(f => f !== flower && f.id !== flower.id);
   }
 
   console.log("flowers array after remove:", flowers); // Debug
