@@ -100,7 +100,7 @@ row.querySelector(".removeFlower").addEventListener("click", async () => {
         const { error } = await supabase
         .from("flowers")
         .delete()
-        .eq("id", flower.id); // make sure flower.id exists in your array
+        .eq("id", flower.id) // make sure flower.id exists in your array
         .eq("tenant_id", tenantId);
     if (error) {
         console.error("Error deleting flower:", error);
