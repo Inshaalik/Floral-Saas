@@ -93,12 +93,12 @@ row.querySelector(".removeFlower").addEventListener("click", () => {
     if (!confirm(`Remove ${flower.name || 'this flower'}?`)) return;
 
     // Track deleted flower IDs (existing flowers)
-    if (flower.id && !deletedFlowerIds.includes(flower.id)) {
+    if (flower.id && !deletedFlowerIds.includes(flower.id) && flower.name.trim() !== "") {
         deletedFlowerIds.push(flower.id);
     }
 
     // Remove from local array (all flowers have unique id)
-    flowers = flowers.filter(f => f.id !== flower.id);
+    flowers = flowers.filter(f => f !== flower);
 
     console.log("flowers array after remove:", flowers);
     console.log("deletedFlowerIds array:", deletedFlowerIds);
@@ -186,31 +186,20 @@ saveFlowersButton.addEventListener("click", async () => {
             .in("id", deletedFlowerIds)
             .eq("tenant_id", tenantId);
         if (deleteError) 
-            return alert("Error deleting flowers: " + deleteError.message);
-            
+            return alert("Error deleting flowers: " + deleteError.message);  
          deletedFlowerIds = []; // reset after successful deletion
     }
-    
-
     // 2️⃣ Upsert remaining flowers
-
-    const flowersToSave = flowers.map(f => ({ 
-        id: f.id || uuidv4(),
-        name: f.name,
-        wholesale: f.wholesale || 0,
-        markup: f.markup || 1,
-        retail: f.retail || 0,
-        tenant_id: tenantId
-         }));
+    const flowersToSave = flowers
+    .filter(f => f.id && f.name.trim() !== "")
+    .map(f => ({ ...f, tenant_id: tenantId }));
               console.log("Upserting flowers:", flowersToSave);
-   
     const { error: upsertError } = await supabase
         .from("flowers")
         .upsert(flowersToSave, { onConflict: ["id"] });
     if (upsertError) {
         return alert("Error saving flowers: " + upsertError.message);
     }
-
     // 3️⃣ Re-fetch and render to make sure local state is correct
     const { data } = await supabase.from("flowers").select("*").eq("tenant_id", tenantId);
     flowers = data || [];
