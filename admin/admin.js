@@ -91,19 +91,37 @@ function renderFlowers() {
 let deletedFlowerIds = [];
 
 // Remove button handler
-row.querySelector(".removeFlower").addEventListener("click", () => {
+row.querySelector(".removeFlower").addEventListener("click", async () => {
     // Confirm delete
     if (!confirm(`Remove ${flower.name || 'this flower'}?`)) return;
 
-    // 1️⃣ Remove from local array
-    flowers = flowers.filter(f => f.id !== flower.id);
+    // 1️⃣ Delete directly from Supabase
+    if (flower.id) {
+        const tenantId = localStorage.getItem('tenantId');
+        try {
+            const { error } = await supabase
+                .from("flowers")
+                .delete()
+                .eq("id", flower.id)
+                .eq("tenant_id", tenantId);
 
-    // 2️⃣ Track deleted flower ID for later deletion on save
-    if (flower.id) deletedFlowerIds.push(flower.id);
+            if (error) throw error;
+
+            console.log("Flower deleted successfully");
+        } catch (err) {
+            console.error("Error deleting flower:", err);
+            alert("Could not delete flower");
+            return;
+        }
+    }
+
+    // 2️⃣ Remove from local array
+    flowers = flowers.filter(f => f.id !== flower.id);
 
     // 3️⃣ Re-render table
     renderFlowers();
     });
+
     });  
 
 }
