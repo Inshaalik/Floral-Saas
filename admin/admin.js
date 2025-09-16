@@ -161,19 +161,19 @@ row.querySelector(".removeFlower").addEventListener("click", () => {
     // ----- Buttons -----
     addFlowerButton.addEventListener("click", () => {
         const tenantId = localStorage.getItem("tenantId");
-        flowers.push({ id: uuidv4(), name: "", wholesale: 0, markup: 3.5, retail: 0 });
+        flowers.unshift({ id: uuidv4(), name: "", wholesale: 0, markup: 3.5, retail: 0 });
         renderFlowers();
     });
 
     addHardGoodButton.addEventListener("click", () => {
-        hardGoods.push({ id: uuidv4(), name: "", price: 0 });
+        hardGoods.unshift({ id: uuidv4(), name: "", price: 0 });
         renderHardGoods();
     });
 
     addDesignerButton.addEventListener("click", () => {
         const name = newDesignerInput.value.trim();
         if (!name) return;
-        designers.push({ id: uuidv4(), name });
+        designers.unshift({ id: uuidv4(), name });
         newDesignerInput.value = "";
         renderDesigners();
     });
