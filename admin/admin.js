@@ -192,7 +192,7 @@ saveFlowersButton.addEventListener("click", async () => {
     // 2️⃣ Upsert remaining flowers
     const flowersToSave = flowers
     .filter(f => f.name.trim() !== "")
-    .map(f => ({ ...f, tenant_id: tenantId, id: f.id || uuidv4() })); // assign new UUID if no id
+    .map(f => ({ ...f, tenant_id: tenantId})); 
               console.log("Upserting flowers:", flowersToSave);
      if (flowersToSave.length > 0) {       
     const { error: upsertError } = await supabase
