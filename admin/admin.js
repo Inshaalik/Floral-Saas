@@ -213,7 +213,6 @@ saveFlowersButton.addEventListener("click", async () => {
     flowers.sort((a, b) => a.name.localeCompare(b.name || ""));
     renderFlowers();
 
-    alert("Flowers saved!");
 });
 
     saveHardGoodsButton.addEventListener("click", async () => {
