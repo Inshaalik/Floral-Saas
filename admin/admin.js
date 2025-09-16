@@ -196,7 +196,7 @@ saveFlowersButton.addEventListener("click", async () => {
     }
     // 2️⃣ Upsert remaining flowers
     const flowersToSave = flowers
-    .filter(f => f.name.trim() !== "")
+    .filter(f => f.name.trim() !== "" && !deletedFlowerIds.includes(f.id))
     .map(f => ({ ...f, tenant_id: tenantId})); 
               console.log("Upserting flowers:", flowersToSave);
      if (flowersToSave.length > 0) {       
