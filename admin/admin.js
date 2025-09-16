@@ -99,11 +99,11 @@ row.querySelector(".removeFlower").addEventListener("click", () => {
 
     // Remove from local array (all flowers have unique id)
     flowers = flowers.filter(f => f.id !== flower.id);
+    row.remove();
 
     console.log("flowers array after remove:", flowers);
     console.log("deletedFlowerIds array:", deletedFlowerIds);
 
-    renderFlowers();
 });
 
     });  
