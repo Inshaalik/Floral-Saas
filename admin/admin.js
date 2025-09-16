@@ -92,19 +92,23 @@ function renderFlowers() {
 row.querySelector(".removeFlower").addEventListener("click", () => {
     if (!confirm(`Remove ${flower.name || 'this flower'}?`)) return;
 
-    // Track deleted flower IDs (existing flowers)
-    if (flower.id && !deletedFlowerIds.includes(flower.id)) {
-        deletedFlowerIds.push(flower.id);
+    // Find the index of this flower in the array
+    const flowerIndex = flowers.findIndex(f => f.id === flower.id);
+    if (flowerIndex !== -1) {
+        // 1️⃣ Add to deletedFlowerIds
+        if (!deletedFlowerIds.includes(flower.id)) deletedFlowerIds.push(flower.id);
+
+        // 2️⃣ Remove from flowers array
+        flowers.splice(flowerIndex, 1);
+
+        console.log("flowers array after remove:", flowers);
+        console.log("deletedFlowerIds array:", deletedFlowerIds);
+
+        // 3️⃣ Re-render
+        renderFlowers();
     }
-
-    // Remove from local array (all flowers have unique id)
-    flowers = flowers.filter(f => f.id !== flower.id);
-    row.remove();
-
-    console.log("flowers array after remove:", flowers);
-    console.log("deletedFlowerIds array:", deletedFlowerIds);
-
 });
+
 
     });  
 
