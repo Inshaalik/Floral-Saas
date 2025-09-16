@@ -156,6 +156,7 @@ row.querySelector(".removeFlower").addEventListener("click", () => {
 
     // ----- Buttons -----
     addFlowerButton.addEventListener("click", () => {
+        const tenantId = localStorage.getItem("tenantId");
         flowers.push({ id: uuidv4(), name: "", wholesale: 0, markup: 3.5, retail: 0 });
         renderFlowers();
     });
