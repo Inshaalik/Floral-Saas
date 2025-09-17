@@ -229,56 +229,84 @@ if (flowersMoreButton) {
 
 
 saveFlowersButton.addEventListener("click", async () => {
-    const tenantId = localStorage.getItem("tenantId");
+  const tenantId = localStorage.getItem("tenantId");
+  const idsToDelete = [...deletedFlowerIds]; // snapshot
 
-     // store deleted IDs before we reset array
-  const idsToDelete = [...deletedFlowerIds];
+  // disable UI while saving
+  saveFlowersButton.disabled = true;
+  const origText = saveFlowersButton.textContent;
+  saveFlowersButton.textContent = "Saving...";
 
   try {
-    // 1️⃣ Delete removed flowers from Supabase first
+    // 1) Delete removed flowers
     if (idsToDelete.length > 0) {
-      console.log("Deleting flowers with IDs:", idsToDelete);
-      const { error: deleteError } = await supabase
+      console.log("Attempting to delete IDs:", idsToDelete);
+      const { data: deletedData, error: deleteError } = await supabase
         .from("flowers")
         .delete()
         .in("id", idsToDelete)
         .eq("tenant_id", tenantId);
 
-      if (deleteError) throw new Error("Error deleting flowers: " + deleteError.message);
+      if (deleteError) {
+        console.error("Supabase delete error:", deleteError);
+        throw new Error("Error deleting flowers: " + deleteError.message);
+      }
+
+      console.log("Delete returned rows:", deletedData?.length, deletedData);
+      // verify deletion count
+      if ((deletedData?.length || 0) !== idsToDelete.length) {
+        console.warn("Warning: deleted rows returned does not match requested count.",
+                     "requested:", idsToDelete.length, "deleted:", deletedData?.length);
+        // If you want to fail here to investigate, uncomment:
+        // throw new Error("Not all requested rows were deleted. Check tenant_id, RLS, or IDs.");
+      }
 
       // reset only after successful deletion
       deletedFlowerIds = [];
     }
 
-    // 2️⃣ Upsert remaining flowers
+    // 2) Upsert remaining flowers (exclude idsToDelete)
     const flowersToSave = flowers
-    .filter(f => f.name.trim() !== "" && !idsToDelete.includes(f.id))
-    .map(f => ({ ...f, tenant_id: tenantId})); 
-              console.log("Upserting flowers:", flowersToSave);
-     if (flowersToSave.length > 0) {       
-    const { error: upsertError } = await supabase
+      .filter(f => (f.name || "").trim() !== "" && !idsToDelete.includes(f.id))
+      .map(f => ({ ...f, tenant_id: tenantId }));
+
+    console.log("Upserting flowers (count):", flowersToSave.length, flowersToSave.slice(0,6));
+    if (flowersToSave.length > 0) {
+      const { data: upsertData, error: upsertError } = await supabase
         .from("flowers")
         .upsert(flowersToSave, { onConflict: ["id"] });
-    if (upsertError) {
+
+      if (upsertError) {
+        console.error("Supabase upsert error:", upsertError);
         throw new Error("Error saving flowers: " + upsertError.message);
+      }
+      console.log("Upsert returned rows:", upsertData?.length, upsertData?.slice(0,6));
     }
-    }
-     // 3️⃣ Re-fetch and render to make sure local state is correct
-    const { data, error: fetchError } = await supabase
+
+    // 3) Re-fetch and render to confirm DB state
+    const { data: freshData, error: fetchError } = await supabase
       .from("flowers")
       .select("*")
       .eq("tenant_id", tenantId);
 
-    if (fetchError) throw new Error("Error fetching flowers: " + fetchError.message);
+    if (fetchError) {
+      console.error("Supabase fetch error:", fetchError);
+      throw new Error("Error fetching flowers: " + fetchError.message);
+    }
 
-    flowers = data || [];
+    console.log("Fetched rows from DB:", freshData?.length);
+    flowers = freshData || [];
     flowers.sort((a, b) => a.name.localeCompare(b.name || ""));
     renderFlowers();
 
-    console.log("✅ Save complete!");
-  } catch (error) {
-    console.error("❌ Error saving flowers:", error);
-    alert(error.message);
+    console.log("✅ Save complete");
+  } catch (err) {
+    console.error("Save failed:", err);
+    alert(err.message || "Save failed - check console for details.");
+  } finally {
+    // re-enable UI
+    saveFlowersButton.disabled = false;
+    saveFlowersButton.textContent = origText;
   }
 });
 
