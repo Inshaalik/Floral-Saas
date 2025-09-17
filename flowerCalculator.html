@@ -40,6 +40,14 @@ $<input type="number" id="customerPrice" value="0">
       <!-- Hidden but still computed -->
       <input type="hidden" id="wastage" value="0">
       <input type="hidden" id="ccfee" value="0">
+      <div class="payment-toggle">
+  <label>Payment Method:</label>
+  <div class="toggle-buttons">
+    <button type="button" id="cashButton">Cash</button>
+    <button type="button" id="creditButton" class="active">Credit</button>
+  </div>
+</div>
+
     </section>
 
  <!-- Column 2: Designer + Hard Goods -->
@@ -52,7 +60,29 @@ $<input type="number" id="customerPrice" value="0">
       <h2>Hard Goods</h2>
        <input list="hardGoodsOptions" id="hardGoodsSelect" placeholder="Type or pick a hard good">
   <datalist id="hardGoodsOptions"></datalist>
-     
+     <!-- Payment method toggle 
+<div class="toggle-group">
+  <span>Payment:</span>
+  <button type="button" id="cashButton" class="toggle active">Cash</button>
+  <button type="button" id="creditButton" class="toggle">Credit</button>
+</div>
+-->
+<!-- Packaging toggle -->
+<div class="toggle-group">
+  <label>
+    <input type="checkbox" id="packagingToggle">
+    Packaging ($8)
+  </label>
+</div>
+
+<!-- Script Ribbon toggle -->
+<div class="toggle-group">
+  <label>
+    <input type="checkbox" id="ribbonToggle">
+    Script Ribbon ($10)
+  </label>
+</div>
+
     </section>
 
     <!-- Column 3: Flowers -->

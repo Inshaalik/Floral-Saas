@@ -363,3 +363,43 @@ body.login-page form button:hover {
 .calculator-grid label {
     display: block;
 }
+/* Make Greens bold and same color/size as headings */
+.recipe strong {
+    color: #2F5233;        /* same as h2 headings */
+    font-size: 18px;       /* match h2 size */
+}
+
+#greens {
+    color: #2F5233;        /* same as h2 headings */
+    font-weight: bold;
+    font-size: 18px;
+}
+/* Align labels and inputs/values vertically */
+section.recipe label,
+section.recipe div {
+    display: flex;
+    align-items: center;
+    gap: 8px;   /* space between label and input/value */
+    margin-bottom: 12px;
+}
+.toggle-buttons {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.toggle-buttons button {
+  flex: 1;
+  padding: 6px 12px;
+  border: 1px solid #D9CFC1;
+  border-radius: 6px;
+  background-color: #FFF8F0;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.toggle-buttons button.active {
+  background-color: #3E7C59;
+  color: #fff;
+  border-color: #3E7C59;
+}

@@ -31,6 +31,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     const remainingOutput = document.getElementById("remaining");
     const saveRecipeButton = document.getElementById("saveRecipeButton");
     const clearButton = document.getElementById("clearButton");
+    const cashButton = document.getElementById("cashButton");
+    const creditButton = document.getElementById("creditButton");
+    const packagingToggle = document.getElementById("packagingToggle");
+    const ribbonToggle = document.getElementById("ribbonToggle");
+    
 
     // ----- State -----
     let flowersData = window.masterFlowers || [];
@@ -40,7 +45,35 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     let flowers = [];
     let selectedHardGood = { name: "", price: 0 };
+    // ----- Toggle state -----
+    let isCredit = true;        // default credit
+    let packagingOn = false;     // Packaging toggle
+    let ribbonOn = false;        // Script ribbon toggle
 
+
+cashButton.addEventListener("click", () => {
+    isCredit = false;
+    cashButton.classList.add("active");
+    creditButton.classList.remove("active");
+    updateTotals();
+});
+
+creditButton.addEventListener("click", () => {
+    isCredit = true;
+    creditButton.classList.add("active");
+    cashButton.classList.remove("active");
+    updateTotals();
+});
+packagingToggle.addEventListener("change", () => {
+    packagingOn = packagingToggle.checked;
+    updateTotals();
+});
+
+ribbonToggle.addEventListener("change", () => {
+    ribbonOn = ribbonToggle.checked;
+    updateTotals();
+});
+    
     // ----- Render Functions -----
     function renderFlowers() {
         flowerList.innerHTML = "";
@@ -104,7 +137,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Pull percentages from admin data
     const greensValue = (percentagesData.greens / 100) * customerPrice;
     const wastageValue = (percentagesData.wastage / 100) * customerPrice;
-    const ccfeeValue = (percentagesData.ccfee / 100) * customerPrice;
+    const ccfeeValue = isCredit ? (percentagesData.ccfee / 100) * customerPrice : 0;
+    const packagingCost = packagingOn ? 8 : 0;
+    const ribbonCost = ribbonOn ? 10 : 0;
 
     // Only display greens
   // Greens is now a <span>, not an <input>
@@ -114,7 +149,7 @@ document.getElementById("greens").textContent = greensValue.toFixed(2);
 wastageInput.value = wastageValue.toFixed(2);
 ccfeeInput.value = ccfeeValue.toFixed(2);
 
-    const totalSpent = flowerTotal + hardGoodsCost + greensValue + wastageValue + ccfeeValue;
+    const totalSpent = flowerTotal + hardGoodsCost + greensValue + wastageValue + ccfeeValue + packagingCost + ribbonCost;
     const remaining = customerPrice - totalSpent;
 
     flowerTotalOutput.textContent = totalSpent.toFixed(2);
