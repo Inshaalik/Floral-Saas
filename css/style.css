@@ -298,3 +298,52 @@ button {
   padding: 4px 0;         /* less vertical space */
 }
 
+/* Center login form vertically and horizontally */
+body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* vertical centering */
+    align-items: center;     /* horizontal centering */
+    min-height: 100vh;       /* full viewport height */
+    margin: 0;
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    background-color: #FAF9F6; /* optional: match your theme */
+}
+
+main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;            /* space between inputs and button */
+    background: #fff;
+    padding: 24px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    min-width: 280px;
+    max-width: 360px;
+}
+
+form input,
+form button {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid #D9CFC1;
+    font-size: 16px;
+}
+
+form button {
+    background-color: #3E7C59;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+}
+
+form button:hover {
+    background-color: #2F5233;
+}

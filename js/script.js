@@ -125,13 +125,60 @@ ccfeeInput.value = ccfeeValue.toFixed(2);
 }
 
 
-    // ----- Event Listeners -----
-    // Hard goods selection
-    hardGoodsSelect.addEventListener("change", e => {
-        const selected = hardGoodsData.find(h => h.name === e.target.value);
-        selectedHardGood = selected || { name: "", price: 0 };
-        updateTotals();
+ // ----- Hard Goods: Populate Datalist -----
+function populateHardGoodsDatalist() {
+    const datalist = document.getElementById("hardGoodsOptions");
+    datalist.innerHTML = "";
+    hardGoodsData.forEach(h => {
+        const option = document.createElement("option");
+        option.value = `${h.name} ($${h.price || 0})`;
+        datalist.appendChild(option);
     });
+}
+
+// ----- Hard Goods: Live Filter as User Types -----
+const hardGoodsInput = document.getElementById("hardGoodsSelect");
+hardGoodsInput.addEventListener("input", () => {
+    const inputVal = hardGoodsInput.value.trim().toLowerCase();
+    const datalist = document.getElementById("hardGoodsOptions");
+    datalist.innerHTML = "";
+
+    if (!inputVal) {
+        // Show full list if box is empty
+        hardGoodsData.forEach(h => {
+            const option = document.createElement("option");
+            option.value = `${h.name} ($${h.price || 0})`;
+            datalist.appendChild(option);
+        });
+        selectedHardGood = { name: "", price: 0 };
+        updateTotals();
+        return;
+    }
+
+    // Prioritize matches starting with input, then anywhere
+    const startsWith = hardGoodsData.filter(h => h.name.toLowerCase().startsWith(inputVal));
+    const contains = hardGoodsData.filter(h =>
+        !startsWith.includes(h) && h.name.toLowerCase().includes(inputVal)
+    );
+    const combined = [...startsWith, ...contains];
+
+    combined.forEach(h => {
+        const option = document.createElement("option");
+        option.value = `${h.name} ($${h.price || 0})`;
+        datalist.appendChild(option);
+    });
+
+    // If user types exact match, update selectedHardGood
+    const exactMatch = hardGoodsData.find(h =>
+        h.name.toLowerCase() === inputVal.split(" ($")[0].trim().toLowerCase()
+    );
+    selectedHardGood = exactMatch || { name: "", price: 0 };
+    updateTotals();
+});
+
+// ----- Initial Render -----
+populateHardGoodsDatalist();
+
 
     // Customer price input
     customerPriceInput.addEventListener("input", updateTotals);

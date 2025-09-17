@@ -80,7 +80,7 @@ loginForm?.addEventListener('submit', async (e) => {
     localStorage.setItem('tenantId', memberships[0].tenant_id);
     localStorage.setItem('role', role);
 
-    alert(`Logged in as ${email} (${role})`);
+   // alert(`Logged in as ${email} (${role})`);//
 
     // Redirect based on role
     redirectByRole(role);
