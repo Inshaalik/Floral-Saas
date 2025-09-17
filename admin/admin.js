@@ -231,21 +231,28 @@ if (flowersMoreButton) {
 saveFlowersButton.addEventListener("click", async () => {
     const tenantId = localStorage.getItem("tenantId");
 
+     // store deleted IDs before we reset array
+  const idsToDelete = [...deletedFlowerIds];
+
+  try {
     // 1️⃣ Delete removed flowers from Supabase first
-    if (deletedFlowerIds.length > 0) {
-        console.log("Deleting flowers with IDs:", deletedFlowerIds);
-        const { error: deleteError } = await supabase
-            .from("flowers")
-            .delete()
-            .in("id", deletedFlowerIds)
-            .eq("tenant_id", tenantId);
-        if (deleteError) 
-            return alert("Error deleting flowers: " + deleteError.message);  
-         deletedFlowerIds = []; // reset after successful deletion
+    if (idsToDelete.length > 0) {
+      console.log("Deleting flowers with IDs:", idsToDelete);
+      const { error: deleteError } = await supabase
+        .from("flowers")
+        .delete()
+        .in("id", idsToDelete)
+        .eq("tenant_id", tenantId);
+
+      if (deleteError) throw new Error("Error deleting flowers: " + deleteError.message);
+
+      // reset only after successful deletion
+      deletedFlowerIds = [];
     }
+
     // 2️⃣ Upsert remaining flowers
     const flowersToSave = flowers
-    .filter(f => f.name.trim() !== "" && !deletedFlowerIds.includes(f.id))
+    .filter(f => f.name.trim() !== "" && !idsToDelete.includes(f.id))
     .map(f => ({ ...f, tenant_id: tenantId})); 
               console.log("Upserting flowers:", flowersToSave);
      if (flowersToSave.length > 0) {       
@@ -253,15 +260,26 @@ saveFlowersButton.addEventListener("click", async () => {
         .from("flowers")
         .upsert(flowersToSave, { onConflict: ["id"] });
     if (upsertError) {
-        return alert("Error saving flowers: " + upsertError.message);
+        throw new Error("Error saving flowers: " + upsertError.message);
     }
     }
-    // 3️⃣ Re-fetch and render to make sure local state is correct
-    const { data } = await supabase.from("flowers").select("*").eq("tenant_id", tenantId);
+     // 3️⃣ Re-fetch and render to make sure local state is correct
+    const { data, error: fetchError } = await supabase
+      .from("flowers")
+      .select("*")
+      .eq("tenant_id", tenantId);
+
+    if (fetchError) throw new Error("Error fetching flowers: " + fetchError.message);
+
     flowers = data || [];
     flowers.sort((a, b) => a.name.localeCompare(b.name || ""));
     renderFlowers();
 
+    console.log("✅ Save complete!");
+  } catch (error) {
+    console.error("❌ Error saving flowers:", error);
+    alert(error.message);
+  }
 });
 
     saveHardGoodsButton.addEventListener("click", async () => {
