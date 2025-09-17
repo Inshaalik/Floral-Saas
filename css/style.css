@@ -350,3 +350,16 @@ body.login-page form button {
 body.login-page form button:hover {
     background-color: #2F5233;
 }
+/* ---------- Unified Headings & Key Labels ---------- */
+.calculator-grid h2,
+.calculator-grid label {
+    color: #2F5233;       /* same deep green as recipe */
+    font-size: 18px;      /* match size across all */
+    font-weight: bold;    /* same boldness */
+    margin-bottom: 8px;   /* consistent spacing below */
+}
+
+/* Optional: Make label text appear on its own line */
+.calculator-grid label {
+    display: block;
+}
