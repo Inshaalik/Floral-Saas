@@ -241,30 +241,32 @@ saveFlowersButton.addEventListener("click", async () => {
     // 1) Delete removed flowers
     if (idsToDelete.length > 0) {
       console.log("Attempting to delete IDs:", idsToDelete);
-      const { error: deleteError } = await supabase
+      const { data: deleted, error: deleteError } = await supabase
         .from("flowers")
         .delete()
         .in("id", idsToDelete)
-        .eq("tenant_id", tenantId);
+        .eq("tenant_id", tenantId)
+        .select();
 
-      if (deleteError) 
+      if (deleteError) {
         console.error("Supabase delete error:", deleteError);
         throw new Error(deleteError.message);
-        deletedFlowerIds = []; // reset on error to avoid repeated failures
-      }
-
-      
+        }
+console.log("Deleted rows from DB:", deleted);
+      deletedFlowerIds = []; // reset on error to avoid repeated failures
+    }
 
     // 2) Upsert remaining flowers (exclude idsToDelete)
     const flowersToSave = flowers
-      .filter(f => (f.name || "").trim() !== "")
+      .filter(f => (f.name || "").trim() !== "" && !idsToDelete.includes(f.id))
       .map(f => ({ ...f, tenant_id: tenantId }));
 
     console.log("Upserting flowers (count):", flowersToSave.length, flowersToSave.slice(0,6));
     if (flowersToSave.length > 0) {
-      const {error: upsertError } = await supabase
+      const { data: upsertData, error: upsertError } = await supabase
         .from("flowers")
-        .upsert(flowersToSave, { onConflict: ["id"] });
+        .upsert(flowersToSave, { onConflict: ["id"] })
+        .select();
 
       if (upsertError) {
         console.error("Supabase upsert error:", upsertError);
