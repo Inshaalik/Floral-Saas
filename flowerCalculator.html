@@ -43,7 +43,7 @@ $<input type="number" id="customerPrice" value="0">
       <div class="payment-toggle">
   <label>Payment Method:</label>
   <div class="toggle-buttons">
-    <button type="button" id="cashButton">Cash</button>
+    <button type="button" id="cashButton" >Cash</button>
     <button type="button" id="creditButton" class="active">Credit</button>
   </div>
 </div>
@@ -58,31 +58,34 @@ $<input type="number" id="customerPrice" value="0">
       </select>
 
       <h2>Hard Goods</h2>
+      <div class="options-row">
        <input list="hardGoodsOptions" id="hardGoodsSelect" placeholder="Type or pick a hard good">
-  <datalist id="hardGoodsOptions"></datalist>
-     <!-- Payment method toggle 
-<div class="toggle-group">
-  <span>Payment:</span>
-  <button type="button" id="cashButton" class="toggle active">Cash</button>
-  <button type="button" id="creditButton" class="toggle">Credit</button>
-</div>
--->
+   <label>
+      <input type="checkbox" id="packagingToggle">
+      Packaging ($8)
+    </label>
+    <label>
+      <input type="checkbox" id="ribbonToggle">
+      Script Ribbon ($10)
+    </label>
+  </div>
+       <datalist id="hardGoodsOptions"></datalist>
+   
 <!-- Packaging toggle -->
-<div class="toggle-group">
+<!--<div class="toggle-group">
   <label>
     <input type="checkbox" id="packagingToggle">
     Packaging ($8)
   </label>
-</div>
+</div>-->
 
 <!-- Script Ribbon toggle -->
-<div class="toggle-group">
+<!--<div class="toggle-group">
   <label>
     <input type="checkbox" id="ribbonToggle">
     Script Ribbon ($10)
   </label>
-</div>
-
+</div>-->
     </section>
 
     <!-- Column 3: Flowers -->
