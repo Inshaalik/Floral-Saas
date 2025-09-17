@@ -75,7 +75,7 @@ button:hover {
 
 .totals {
   position: absolute;
-  top: 24px;
+  top: 60px;
   right: 24px;
   display: flex;
   flex-wrap: wrap;
