@@ -9,6 +9,10 @@ document.addEventListener("DOMContentLoaded", () => {
     let designers = [];
     let percentages = { id: uuidv4(), greens: 0, wastage: 0, ccfee: 0 };
     let deletedFlowerIds = [];
+    // ----- Pagination & Filter State -----
+    let flowersCurrentLetter = "All"; // Default: show all
+    let flowersRowsShown = 10;        // Number of rows initially visible
+    const flowersRowsIncrement = 10;   // Number of rows to add when "Load More" is clicked
 
     // ----- DOM elements -----
     const flowersTable = document.querySelector("#flowersTable tbody");
@@ -28,11 +32,46 @@ document.addEventListener("DOMContentLoaded", () => {
     const wastageInput = document.getElementById("wastagePercent");
     const ccfeeInput = document.getElementById("ccfeePercent");
 
+    // ----- Render Alphabet Buttons -----
+function renderFlowerAlphabet() {
+    const container = document.getElementById("flowersAlphabetFilter");
+    if (!container) return;
+
+    const letters = ["All", ..."ABCDEFGHIJKLMNOPQRSTUVWXYZ"];
+    container.innerHTML = "";
+
+    letters.forEach(letter => {
+        const btn = document.createElement("button");
+        btn.textContent = letter;
+        btn.classList.add("alphabet-btn");
+        if (letter === flowersCurrentLetter) btn.classList.add("active");
+
+        btn.addEventListener("click", () => {
+            flowersCurrentLetter = letter;
+            flowersRowsShown = 10; // Reset visible rows when changing letter
+            renderFlowers();
+            renderFlowerAlphabet(); // update active button
+        });
+
+        container.appendChild(btn);
+    });
+}
+
     // ----- Render Functions -----
 function renderFlowers() {
     flowersTable.innerHTML = "";
     // Do NOT sort here, sorting happens only on save
-    flowers.forEach(flower => {
+// 1️⃣ Filter by selected alphabet
+let filteredFlowers = flowers;
+if (flowersCurrentLetter !== "All") {
+    filteredFlowers = flowers.filter(f => f.name.toUpperCase().startsWith(flowersCurrentLetter));
+}
+
+// 2️⃣ Paginate
+const flowersToShow = filteredFlowers.slice(0, flowersRowsShown);
+
+// 3️⃣ Render only the filtered & paginated flowers
+flowersToShow.forEach(flower => {
         const row = document.createElement("tr");
         row.innerHTML = `
             <td><input type="text" class="flowerName" value="${flower.name}"></td>
@@ -106,6 +145,16 @@ row.querySelector(".removeFlower").addEventListener("click", () => {
 
         // 3️⃣ Re-render
         renderFlowers();
+        // 4️⃣ Optionally, show "More" button if there are more rows
+const flowersMoreButton = document.getElementById("flowersLoadMore");
+if (flowersMoreButton) {
+    flowersMoreButton.style.display = filteredFlowers.length > flowersRowsShown ? "inline-block" : "none";
+// Add click handler to load more rows
+    flowersMoreButton.onclick = () => {
+        flowersRowsShown += flowersRowsIncrement;
+        renderFlowers();
+    };
+}
     }
 });
 
