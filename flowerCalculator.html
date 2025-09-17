@@ -21,7 +21,7 @@
     </nav>
 
     <header>
-        <h1>🌸 Floral Budget Calculator 🌸</h1>
+        <h1> Floral Budget Calculator </h1>
     </header>
 
 <main class="calculator-grid">
@@ -30,8 +30,10 @@
         <h2>Recipe</h2>
         <input type="text" id="recipeName" placeholder="Enter recipe name">
 
-        <label>Customer Price: $<input type="number" id="customerPrice" value="0"></label>
-      
+      <label for="customerPrice" class="block-label">
+  Customer Price:
+</label>
+$<input type="number" id="customerPrice" value="0">
           <div>
         <strong>Greens:</strong> $<span id="greens">0</span>
       </div>
@@ -66,7 +68,7 @@
       <datalist id="flowerOptions"></datalist>
 
       <label for="flowerQty">Quantity:</label>
-      <input type="number" id="flowerQty" value="0" min="0">
+      <input type="number" id="flowerQty" value="1" min="1">
 
       <button id="addFlowerButton">Add Flower</button>
 

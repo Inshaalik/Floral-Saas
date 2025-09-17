@@ -135,6 +135,38 @@ ccfeeInput.value = ccfeeValue.toFixed(2);
 
     // Customer price input
     customerPriceInput.addEventListener("input", updateTotals);
+     // 🔍 Live filter as user types in the flower input
+    flowerSelectInput.addEventListener("input", () => {
+        const inputVal = flowerSelectInput.value.trim().toLowerCase();
+        const datalist = document.getElementById("flowerOptions");
+
+        // Clear the old list
+        datalist.innerHTML = "";
+
+        if (!inputVal) {
+            // Show full list if box is empty
+            flowersData.forEach(f => {
+                const option = document.createElement("option");
+                option.value = `${f.name} ($${f.retail.toFixed(2)})`;
+                datalist.appendChild(option);
+            });
+            return;
+        }
+
+        // Prioritize matches at start, then anywhere
+        const startsWith = flowersData.filter(f => f.name.toLowerCase().startsWith(inputVal));
+        const contains = flowersData.filter(f =>
+            !startsWith.includes(f) && f.name.toLowerCase().includes(inputVal)
+        );
+
+        const combined = [...startsWith, ...contains];
+
+        combined.forEach(f => {
+            const option = document.createElement("option");
+            option.value = `${f.name} ($${f.retail.toFixed(2)})`;
+            datalist.appendChild(option);
+        });
+    });
 
     // Flower selection - dropdown + quantity input
     addFlowerButton.addEventListener("click", () => {
@@ -143,14 +175,16 @@ ccfeeInput.value = ccfeeValue.toFixed(2);
             alert("Please select a flower.");
             return;
         }
-           const selectedName = selectedValue.split(" ($")[0]; // ✅ Extract just the name
+           const selectedName = selectedValue.split(" ($")[0].trim(); // ✅ Extract just the name
          const qty = Number(flowerQtyInput.value);
         if (!qty || qty <= 0) {
             alert("Please enter a valid quantity.");
             return;
         }
 
-        const master = flowersData.find(f => f.name.toLowerCase() === selectedName.toLowerCase());
+        const master = flowersData.find (f =>
+        f.name.toLowerCase().includes(selectedName.toLowerCase())
+        );
         if (!master) {
             alert("Flower not found.");
             return;
@@ -158,7 +192,7 @@ ccfeeInput.value = ccfeeValue.toFixed(2);
 
         flowers.push({ name: master.name, price: master.retail, quantity: qty });
         flowerSelectInput.value = "";
-        flowerQtyInput.value = 0;
+        flowerQtyInput.value = 1;
         renderFlowers();
     });
 
