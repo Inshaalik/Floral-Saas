@@ -172,12 +172,14 @@ row.querySelector(".updateFlower").addEventListener("click", async () => {
   const retail = Number(row.querySelector(".flowerRetail").value) || 0;
 
   // Update the local flower object
+
   flower.name = name;
   flower.wholesale = wholesale;
   flower.markup = markup;
   flower.retail = retail;
 
   // Build payload for Supabase
+  const { saved, ...flowerData } = flower; // exclude 'saved' flag
   const payload = {
     ...flower,
     tenant_id: tenantId
