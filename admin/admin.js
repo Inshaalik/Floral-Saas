@@ -68,7 +68,7 @@ if (flowersCurrentLetter !== "All") {
 }
 
 // 2️⃣ Paginate
-//const flowersToShow = filteredFlowers.slice(0, flowersRowsShown);
+const flowersToShow = filteredFlowers.slice(0, flowersRowsShown);
 
 // 3️⃣ Render only the filtered & paginated flowers
 flowersToShow.forEach(flower => {
