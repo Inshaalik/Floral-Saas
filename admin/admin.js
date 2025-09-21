@@ -178,7 +178,7 @@ row.querySelector(".removeFlower").addEventListener("click", async () => {
     const tenantId = localStorage.getItem("tenantId");
     console.log('TenantId:', tenantId);
 
-    const { error, count } = await supabase
+    const { data, error } = await supabase
       .from("flowers")
       .delete()
       .eq("id", flower.id)       // check this
