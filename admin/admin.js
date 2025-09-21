@@ -165,14 +165,15 @@ const tenantId = localStorage.getItem("tenantId");
 });*/
 row.querySelector(".removeFlower").addEventListener("click", async () => {
   try {
+      const tenantId = localStorage.getItem("tenantId");
+
     // 1️⃣ Remove from local array first (immediate UI update)
     flowers = flowers.filter(f => f.id !== flower.id);
     renderFlowers();
 
     // 2️⃣ Only try to delete from Supabase if the flower was already saved
     if (flower.saved) {
-      const tenantId = localStorage.getItem("tenantId");
-
+    
       // ✅ Delete by id only; we know this flower belongs to the current tenant
       const { error } = await supabase
         .from("flowers")
@@ -227,7 +228,7 @@ row.querySelector(".updateFlower").addEventListener("click", async () => {
   // Save (insert or update) in Supabase
   const { data, error } = await supabase
     .from("flowers")
-    .upsert([payload], { onConflict: ["id", "tenant_id"] })
+    .upsert([payload], { onConflict: ["id"] })
     .select();
 
   if (error) {
@@ -240,8 +241,9 @@ row.querySelector(".updateFlower").addEventListener("click", async () => {
   flower.saved = true;
   Object.assign(flower, data[0]);
 
-  alert(flower.name + " saved/updated!");
   renderFlowers(); // refresh UI to show correct button text
+  alert(flower.name + " saved/updated!");
+  
 });
 
 
