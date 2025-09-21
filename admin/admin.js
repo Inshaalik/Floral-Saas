@@ -187,8 +187,15 @@ row.querySelector(".removeFlower").addEventListener("click", async () => {
 
     console.log('Delete result:', { error, count });
 
-    if (error) throw error;
-    alert("Flower removed!");
+   if (error) {
+  console.error("Delete failed:", error);
+} else if (!data || data.length === 0) {
+  console.warn("No rows deleted - possible RLS or mismatch");
+} else {
+  console.log("Deleted flower:", data[0].name);
+  alert("Flower removed!");
+}
+
     
     // remove from local array anyway
     flowers = flowers.filter(f => f.id !== flower.id);
