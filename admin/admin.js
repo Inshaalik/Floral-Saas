@@ -78,7 +78,11 @@ flowersToShow.forEach(flower => {
             <td><input type="number" step="0.01" class="flowerWholesale" value="${flower.wholesale || 0}"></td>
             <td><input type="number" step="0.01" class="flowerMarkup" value="${flower.markup || 1}"></td>
             <td><input type="number" step="0.01" class="flowerRetail" value="${flower.retail || 0}"></td>
-            <td><button class="removeFlower">Remove</button></td>
+            <td>
+            <button class="updateFlower">Update</button>
+            <button class="removeFlower">Remove</button>
+            </td>
+            
         `;
         flowersTable.appendChild(row);
 
@@ -128,24 +132,33 @@ flowersToShow.forEach(flower => {
     }
 });
 
-row.querySelector(".removeFlower").addEventListener("click", () => {
+row.querySelector(".removeFlower").addEventListener("click", async() => {
     if (!confirm(`Remove ${flower.name || 'this flower'}?`)) return;
 
-    // Find the index of this flower in the array
-    const flowerIndex = flowers.findIndex(f => f.id === flower.id);
-    if (flowerIndex !== -1) {
-        // 1️⃣ Add to deletedFlowerIds
-        if (!deletedFlowerIds.includes(flower.id)) deletedFlowerIds.push(flower.id);
+const tenantId = localStorage.getItem("tenantId");
 
-        // 2️⃣ Remove from flowers array
-        flowers.splice(flowerIndex, 1);
+    if (flower.id && flower.saved !== false) {
+       const { error } = await supabase
+      .from("flowers")
+      .delete()
+      .eq("id", flower.id)
+      .eq("tenant_id", tenantId);
+
+    if (error) {
+      alert("Error deleting flower: " + error.message);
+      return; // stop if DB delete failed
+    }
+  }
+
+  // Remove from local array regardless
+  flowers = flowers.filter(f => f.id !== flower.id);
 
         console.log("flowers array after remove:", flowers);
-        console.log("deletedFlowerIds array:", deletedFlowerIds);
-
+      
         // 3️⃣ Re-render
         renderFlowers();
-        // 4️⃣ Optionally, show "More" button if there are more rows
+});
+     /*   // 4️⃣ Optionally, show "More" button if there are more rows
 const flowersMoreButton = document.getElementById("flowersLoadMore");
 if (flowersMoreButton) {
     flowersMoreButton.style.display = filteredFlowers.length > flowersRowsShown ? "inline-block" : "none";
@@ -156,7 +169,7 @@ if (flowersMoreButton) {
     };
 }
     }
-});
+});*/
 
 
     });  
@@ -210,7 +223,14 @@ if (flowersMoreButton) {
     // ----- Buttons -----
     addFlowerButton.addEventListener("click", () => {
         const tenantId = localStorage.getItem("tenantId");
-        flowers.unshift({ id: uuidv4(), name: "", wholesale: 0, markup: 3.5, retail: 0 });
+        flowers.unshift({ 
+            id: uuidv4(), 
+            name: "",
+            wholesale: 0, 
+            markup: 3.5, 
+            retail: 0, 
+            saved:false
+         });
         renderFlowers();
     });
 
@@ -367,7 +387,7 @@ console.log("Deleted rows from DB:", deleted);
         
         const { data: percData } = await supabase.from("percentages").select("*").eq("tenant_id", tenantId);
         
-        flowers = flowerData || [];
+        flowers = (flowerData || []).map(f => ({ ...f, saved: true })); // mark as saved
         hardGoods = hardGoodData || [];
         designers = designerData || [];
         percentages = percData?.[0] || { id: uuidv4(), greens: 0, wastage: 0, ccfee: 0 };
