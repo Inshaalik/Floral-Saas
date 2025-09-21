@@ -171,8 +171,36 @@ const btnText = flower.saved ===false ? "Add" : "Update";
   }
 });*/
 
-
 row.querySelector(".removeFlower").addEventListener("click", async () => {
+  console.log('Removing flower:', flower);
+
+  try {
+    const tenantId = localStorage.getItem("tenantId");
+    console.log('TenantId:', tenantId);
+
+    const { error, count } = await supabase
+      .from("flowers")
+      .delete()
+      .eq("id", flower.id)       // check this
+      //.eq("tenant_id", tenantId) // temporarily comment this out for testing
+      .select();
+
+    console.log('Delete result:', { error, count });
+
+    if (error) throw error;
+    alert("Flower removed!");
+    
+    // remove from local array anyway
+    flowers = flowers.filter(f => f.id !== flower.id);
+    renderFlowers();
+
+  } catch (err) {
+    console.error("Delete failed:", err);
+    alert("Error deleting flower: " + err.message);
+  }
+});
+
+/*row.querySelector(".removeFlower").addEventListener("click", async () => {
   if (!confirm(`Remove ${flower.name}?`)) return;
 
   const tenantId = localStorage.getItem("tenantId");
@@ -196,7 +224,7 @@ row.querySelector(".removeFlower").addEventListener("click", async () => {
   flowers = flowers.filter(f => f.id !== flower.id);
   renderFlowers();
 });
-
+*/
 
 // ADD or UPDATE button
 row.querySelector(".updateFlower").addEventListener("click", async () => {
