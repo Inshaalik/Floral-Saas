@@ -72,6 +72,8 @@ const flowersToShow = filteredFlowers.slice(0, flowersRowsShown);
 
 // 3️⃣ Render only the filtered & paginated flowers
 flowersToShow.forEach(flower => {
+const btnText = flower.saved ===false ? "Add" : "Update";
+
         const row = document.createElement("tr");
         row.innerHTML = `
             <td><input type="text" class="flowerName" value="${flower.name}"></td>
