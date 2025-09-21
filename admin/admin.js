@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const designerList = document.querySelector("#designerList");
 
     const addFlowerButton = document.getElementById("addFlower");
-    const saveFlowersButton = document.getElementById("saveFlowers");
+    //const saveFlowersButton = document.getElementById("saveFlowers");
     const addHardGoodButton = document.getElementById("addHardGood");
     const saveHardGoodsButton = document.getElementById("saveHardGoods");
     const savePercentagesButton = document.getElementById("savePercentages");
@@ -228,7 +228,7 @@ if (flowersMoreButton) {
     });
 
 
-saveFlowersButton.addEventListener("click", async () => {
+/*saveFlowersButton.addEventListener("click", async () => {
   const tenantId = localStorage.getItem("tenantId");
   const idsToDelete = [...deletedFlowerIds]; // snapshot
 
@@ -300,7 +300,7 @@ console.log("Deleted rows from DB:", deleted);
     saveFlowersButton.disabled = false;
     saveFlowersButton.textContent = origText;
   }
-});
+});*/
 
     saveHardGoodsButton.addEventListener("click", async () => {
         const tenantId = localStorage.getItem("tenantId");
