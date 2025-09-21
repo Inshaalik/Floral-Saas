@@ -185,7 +185,7 @@ row.querySelector(".removeFlower").addEventListener("click", async () => {
       //.eq("tenant_id", tenantId) // temporarily comment this out for testing
       .select();
 
-    console.log('Delete result:', { error, count });
+    console.log('Delete result:', { error, data });
 
    if (error) {
   console.error("Delete failed:", error);
