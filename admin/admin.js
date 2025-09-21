@@ -182,7 +182,7 @@ row.querySelector(".removeFlower").addEventListener("click", async () => {
       .from("flowers")
       .delete()
       .eq("id", flower.id)       // check this
-      //.eq("tenant_id", tenantId) // temporarily comment this out for testing
+      .eq("tenant_id", tenantId) // temporarily comment this out for testing
       .select();
 
     console.log('Delete result:', { error, data });
