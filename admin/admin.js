@@ -422,8 +422,8 @@ if (flowersMoreButton) {
     addDesignerButton.addEventListener("click", () => {
         const name = newDesignerInput.value.trim();
         if (!name) return;
-        designers.unshift({ id: uuidv4(), name, saved: false });
-        newDesignerInput.value = "";
+        designers.unshift({ id: uuidv4(), name"", saved: false 
+        });
         renderDesigners();
     });
 
