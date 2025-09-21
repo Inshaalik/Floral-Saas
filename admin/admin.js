@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let deletedFlowerIds = [];
     // ----- Pagination & Filter State -----
     let flowersCurrentLetter = "All"; // Default: show all
-    let flowersRowsShown = 100;        // Number of rows initially visible
+    let flowersRowsShown = 10;        // Number of rows initially visible
     const flowersRowsIncrement = 10;   // Number of rows to add when "Load More" is clicked
 
     // ----- DOM elements -----
@@ -243,7 +243,7 @@ if (flowersMoreButton) {
                 <td><input type="text" class="hardGoodName" value="${item.name}"></td>
                 <td><input type="number" class="hardGoodPrice" value="${item.price}"></td>
                 <td>
-                   <button class="saveHardGood">${item.saved ? 'Add' : 'Update'}</button>
+                   <button class="saveHardGood">${item.saved ? 'Update' : 'Add'}</button>
                 <button class="removeHardGood">Remove</button>
                 </td>
             `;
@@ -419,34 +419,7 @@ if (flowersMoreButton) {
         renderDesigners();
     });
 
-    saveHardGoodsButton.addEventListener("click", async () => {
-        const tenantId = localStorage.getItem("tenantId");
-        const hardGoodsWithTenant = hardGoods.map(h => ({ ...h, tenant_id: tenantId }));
-        const { error } = await supabase.from("hard_goods")
-            .upsert(hardGoodsWithTenant, { onConflict: ["id"] });
-        if (error) return alert("Error saving hard goods: " + error.message);
-
-        const { data } = await supabase.from("hard_goods").select("*").eq("tenant_id", tenantId);
-        hardGoods = data || [];
-        hardGoods.sort((a, b) => a.name.localeCompare(b.name || ""));
-        renderHardGoods();
-        alert("Hard goods saved!");
-    });
-
-    saveDesignersButton.addEventListener("click", async () => {
-        const tenantId = localStorage.getItem("tenantId");
-        const designersWithTenant = designers.map(d => ({ ...d, tenant_id: tenantId }));
-        const { error } = await supabase.from("designers")
-            .upsert(designersWithTenant, { onConflict: ["id"] });
-        if (error) return alert("Error saving designers: " + error.message);
-
-        const { data } = await supabase.from("designers").select("*").eq("tenant_id", tenantId);
-        designers = data || [];
-        designers.sort((a, b) => a.name.localeCompare(b.name || ""));
-        renderDesigners();
-        alert("Designers saved!");
-    });
-
+  
     savePercentagesButton.addEventListener("click", async () => {
         const tenantId = localStorage.getItem('tenantId');
         percentages = {
@@ -485,8 +458,8 @@ if (flowersMoreButton) {
         const { data: percData } = await supabase.from("percentages").select("*").eq("tenant_id", tenantId);
         
         flowers = (flowerData || []).map(f => ({ ...f, saved: true })); // mark as saved
-        hardGoods = hardGoodData || [];
-        designers = designerData || [];
+        hardGoods = (hardGoodData || []).map(h => ({ ...h, saved: true })); // mark as saved 
+        designers = (designerData || []).map(d => ({ ...d, saved: true })); // mark as saved
         percentages = percData?.[0] || { id: uuidv4(), greens: 0, wastage: 0, ccfee: 0 };
 
         renderFlowers();
