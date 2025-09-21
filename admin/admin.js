@@ -181,7 +181,7 @@ row.querySelector(".updateFlower").addEventListener("click", async () => {
   // Build payload for Supabase
   const { saved, ...flowerData } = flower; // exclude 'saved' flag
   const payload = {
-    ...flower,
+    ...flowerData,
     tenant_id: tenantId
   };
 
