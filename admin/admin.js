@@ -135,7 +135,7 @@ const btnText = flower.saved ===false ? "Add" : "Update";
 });
 
 row.querySelector(".removeFlower").addEventListener("click", async () => {
-  if (!confirm(`Remove ${flower.name || 'this flower'}?`)) return;
+ // if (!confirm(`Remove ${flower.name || 'this flower'}?`)) return;
 
   // Remove locally first
   flowers = flowers.filter(f => f.id !== flower.id);
@@ -153,9 +153,10 @@ row.querySelector(".removeFlower").addEventListener("click", async () => {
     if (error) {
       alert("Error deleting flower from database: " + error.message);
       // Optional: add it back to local array if you want
-      flowers.unshift(flower);
+      flowers.unshift(flower);}
+     {alert(flower.name + " removed.");} 
       renderFlowers();
-    }
+    
   }
 });
 
