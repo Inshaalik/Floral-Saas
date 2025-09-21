@@ -133,44 +133,6 @@ const btnText = flower.saved ===false ? "Add" : "Update";
         wholesaleInput.value = flower.wholesale;
     }
 });
-
-/*row.querySelector(".removeFlower").addEventListener("click", async () => {
-  try {
-      const tenantId = localStorage.getItem("tenantId");
-
-    // 1️⃣ Remove from local array first (immediate UI update)
-    flowers = flowers.filter(f => f.id !== flower.id);
-    renderFlowers();
-
-    // 2️⃣ Only try to delete from Supabase if the flower was already saved
-    if (flower.saved) {
-    
-      // ✅ Delete by id only; we know this flower belongs to the current tenant
-      const { error } = await supabase
-        .from("flowers")
-        .delete()
-        .eq("id", flower.id)
-        .eq("tenant_id", tenantId);
-
-      if (error) {
-        console.error("Failed to remove flower from database:", error);
-        alert("Error deleting flower from database: " + error.message);
-
-        // Optional: put it back in local array if deletion fails
-        flowers.unshift(flower);
-        renderFlowers();
-        return;
-      }
-    }
-
-    // 3️⃣ Notify user
-    alert(flower.name + " removed!");
-  } catch (err) {
-    console.error("Unexpected error removing flower:", err);
-    alert("Unexpected error removing flower. Check console for details.");
-  }
-});*/
-
 row.querySelector(".removeFlower").addEventListener("click", async () => {
   console.log('Removing flower:', flower);
 
@@ -206,32 +168,6 @@ row.querySelector(".removeFlower").addEventListener("click", async () => {
     alert("Error deleting flower: " + err.message);
   }
 });
-
-/*row.querySelector(".removeFlower").addEventListener("click", async () => {
-  if (!confirm(`Remove ${flower.name}?`)) return;
-
-  const tenantId = localStorage.getItem("tenantId");
-
-  // Only try deleting from Supabase if this flower is already saved
-  if (flower.saved) {
-    const { error } = await supabase
-      .from("flowers")
-      .delete()
-      .eq("id", flower.id)
-      .eq("tenant_id", tenantId);
-
-    if (error) {
-      console.error("Failed to remove flower from database:", error);
-      alert("Error deleting flower from database: " + error.message);
-      return;
-    }
-  }
-
-  // ✅ Remove from local array *after* successful delete or if unsaved
-  flowers = flowers.filter(f => f.id !== flower.id);
-  renderFlowers();
-});
-*/
 
 // ADD or UPDATE button
 row.querySelector(".updateFlower").addEventListener("click", async () => {
@@ -306,7 +242,10 @@ if (flowersMoreButton) {
             row.innerHTML = `
                 <td><input type="text" class="hardGoodName" value="${item.name}"></td>
                 <td><input type="number" class="hardGoodPrice" value="${item.price}"></td>
-                <td><button class="removeHardGood">Remove</button></td>
+                <td>
+                   <button class="saveHardGood">${item.saved ? 'Update' : 'Add'}</button>
+                <button class="removeHardGood">Remove</button>
+                </td>
             `;
             hardGoodsTable.appendChild(row);
 
@@ -316,12 +255,67 @@ if (flowersMoreButton) {
             row.querySelector(".hardGoodPrice").addEventListener("input", e => {
                 item.price = Number(e.target.value) || 0;
             });
-            row.querySelector(".removeHardGood").addEventListener("click", () => {
-                hardGoods = hardGoods.filter(h => h.id !== item.id);
-                renderHardGoods();
-            });
+             // Add/Update button
+        row.querySelector(".saveHardGood").addEventListener("click", async () => {
+            try {
+                const tenantId = localStorage.getItem("tenantId");
+                if (!item.saved) {
+                    // Add new hardgood
+                    const { data, error } = await supabase
+                        .from("hard_goods")
+                        .insert([{ id: item.id, name: item.name, price: item.price, tenant_id: tenantId }])
+                        .select();
+                    if (error) throw error;
+                    item.saved = true;
+                    item.id = data[0].id; // in case Supabase changed it
+                    alert("HardGood added!");
+                } else {
+                    // Update existing hardgood
+                    const { error } = await supabase
+                        .from("hard_goods")
+                        .update({ name: item.name, price: item.price })
+                        .eq("id", item.id)
+                        .eq("tenant_id", tenantId);
+                    if (error) throw error;
+                    alert("HardGood updated!");
+                }
+                renderHardGoods(); // refresh row buttons/text
+            } catch (err) {
+                console.error("Error saving hardGood:", err);
+                alert("Error saving hardGood: " + err.message);
+            }
         });
-    }
+
+        // Remove button
+        row.querySelector(".removeHardGood").addEventListener("click", async () => {
+            if (!confirm(`Remove ${item.name || "this hard good"}?`)) return;
+            hardGoods = hardGoods.filter(h => h.id !== item.id);
+            renderHardGoods();
+
+            if (item.saved) {
+                try {
+                    const tenantId = localStorage.getItem("tenantId");
+                    const { error } = await supabase
+                        .from("hard_goods")
+                        .delete()
+                        .eq("id", item.id)
+                        .eq("tenant_id", tenantId);
+                    if (error) throw error;
+                    alert("HardGood removed!");
+                } catch (err) {
+                    console.error("Error deleting hardGood:", err);
+                    alert("Error deleting hardGood: " + err.message);
+                    // optional: put it back in the array if delete fails
+                    hardGoods.unshift(item);
+                    renderHardGoods();
+                }
+            }
+            
+        });
+    });
+}
+    
+
 
     function renderDesigners() {
         designerList.innerHTML = "";
@@ -329,19 +323,74 @@ if (flowersMoreButton) {
             const row = document.createElement("tr");
             row.innerHTML = `
                 <td><input type="text" class="designerName" value="${designer.name}"></td>
-                <td><button class="removeDesigner">Remove</button></td>
+                <td>
+                  <button class="saveDesigner">${designer.saved ? 'Update' : 'Add'}</button>
+                <button class="removeDesigner">Remove</button>
+                </td>
             `;
             designerList.appendChild(row);
 
             row.querySelector(".designerName").addEventListener("input", e => {
                 designer.name = e.target.value;
             });
-            row.querySelector(".removeDesigner").addEventListener("click", () => {
-                designers = designers.filter(d => d.id !== designer.id);
-                renderDesigners();
-            });
+            // Add/Update button
+        row.querySelector(".saveDesigner").addEventListener("click", async () => {
+            try {
+                const tenantId = localStorage.getItem("tenantId");
+                if (!designer.saved) {
+                    // Add new designer
+                    const { data, error } = await supabase
+                        .from("designers")
+                        .insert([{ id: designer.id, name: designer.name, tenant_id: tenantId }])
+                        .select();
+                    if (error) throw error;
+                    designer.saved = true;
+                    designer.id = data[0].id;
+                    alert("Designer added!");
+                } else {
+                    // Update existing designer
+                    const { error } = await supabase
+                        .from("designers")
+                        .update({ name: designer.name })
+                        .eq("id", designer.id)
+                        .eq("tenant_id", tenantId);
+                    if (error) throw error;
+                    alert("Designer updated!");
+                }
+                renderDesigners(); // refresh buttons/text
+            } catch (err) {
+                console.error("Error saving designer:", err);
+                alert("Error saving designer: " + err.message);
+            }
         });
-    }
+
+        // Remove button
+        row.querySelector(".removeDesigner").addEventListener("click", async () => {
+            if (!confirm(`Remove ${designer.name || "this designer"}?`)) return;
+            designers = designers.filter(d => d.id !== designer.id);
+            renderDesigners();
+
+            if (designer.saved) {
+                try {
+                    const tenantId = localStorage.getItem("tenantId");
+                    const { error } = await supabase
+                        .from("designers")
+                        .delete()
+                        .eq("id", designer.id)
+                        .eq("tenant_id", tenantId);
+                    if (error) throw error;
+                    alert("Designer removed!");
+                } catch (err) {
+                    console.error("Error deleting designer:", err);
+                    alert("Error deleting designer: " + err.message);
+                    // optional: put back if delete fails
+                    designers.unshift(designer);
+                    renderDesigners();
+                }
+            }
+        });
+    });
+}
 
     // ----- Buttons -----
     addFlowerButton.addEventListener("click", () => {
@@ -358,92 +407,17 @@ if (flowersMoreButton) {
     });
 
     addHardGoodButton.addEventListener("click", () => {
-        hardGoods.unshift({ id: uuidv4(), name: "", price: 0 });
+        hardGoods.unshift({ id: uuidv4(), name: "", price: 0, saved: false });
         renderHardGoods();
     });
 
     addDesignerButton.addEventListener("click", () => {
         const name = newDesignerInput.value.trim();
         if (!name) return;
-        designers.unshift({ id: uuidv4(), name });
+        designers.unshift({ id: uuidv4(), name, saved: false });
         newDesignerInput.value = "";
         renderDesigners();
     });
-
-
-/*saveFlowersButton.addEventListener("click", async () => {
-  const tenantId = localStorage.getItem("tenantId");
-  const idsToDelete = [...deletedFlowerIds]; // snapshot
-
-  // disable UI while saving
-  saveFlowersButton.disabled = true;
-  const origText = saveFlowersButton.textContent;
-  saveFlowersButton.textContent = "Saving...";
-
-  try {
-    // 1) Delete removed flowers
-    if (idsToDelete.length > 0) {
-      console.log("Attempting to delete IDs:", idsToDelete);
-      const { data: deleted, error: deleteError } = await supabase
-        .from("flowers")
-        .delete()
-        .in("id", idsToDelete)
-        .eq("tenant_id", tenantId)
-        .select();
-
-      if (deleteError) {
-        console.error("Supabase delete error:", deleteError);
-        throw new Error(deleteError.message);
-        }
-console.log("Deleted rows from DB:", deleted);
-      deletedFlowerIds = []; // reset on error to avoid repeated failures
-    }
-
-    // 2) Upsert remaining flowers (exclude idsToDelete)
-    const flowersToSave = flowers
-      .filter(f => (f.name || "").trim() !== "" && !idsToDelete.includes(f.id))
-      .map(f => ({ ...f, tenant_id: tenantId }));
-
-    console.log("Upserting flowers (count):", flowersToSave.length, flowersToSave.slice(0,6));
-    if (flowersToSave.length > 0) {
-      const { data: upsertData, error: upsertError } = await supabase
-        .from("flowers")
-        .upsert(flowersToSave, { onConflict: ["id"] })
-        .select();
-
-      if (upsertError) {
-        console.error("Supabase upsert error:", upsertError);
-        throw new Error(upsertError.message);
-      }
-      console.log("Upsert returned rows:", upsertData?.length, upsertData?.slice(0,6));
-    }
-
-    // 3) Re-fetch and render to confirm DB state
-    const { data: freshData, error: fetchError } = await supabase
-      .from("flowers")
-      .select("*")
-      .eq("tenant_id", tenantId);
-
-    if (fetchError) {
-      console.error("Supabase fetch error:", fetchError);
-      throw new Error(fetchError.message);
-    }
-
-    console.log("Fetched rows from DB:", freshData?.length);
-    flowers = freshData || [];
-    flowers.sort((a, b) => a.name.localeCompare(b.name || ""));
-    renderFlowers();
-
-    console.log("✅ Save complete");
-  } catch (err) {
-    console.error("Save failed:", err);
-    alert(err.message || "Save failed - check console for details.");
-  } finally {
-    // re-enable UI
-    saveFlowersButton.disabled = false;
-    saveFlowersButton.textContent = origText;
-  }
-});*/
 
     saveHardGoodsButton.addEventListener("click", async () => {
         const tenantId = localStorage.getItem("tenantId");
