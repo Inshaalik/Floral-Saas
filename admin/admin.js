@@ -135,35 +135,6 @@ const btnText = flower.saved ===false ? "Add" : "Update";
 });
 
 /*row.querySelector(".removeFlower").addEventListener("click", async () => {
- // if (!confirm(`Remove ${flower.name || 'this flower'}?`)) return;
-const tenantId = localStorage.getItem("tenantId");
-  // Remove locally first
- if (!flower.id){
-     flowers = flowers.filter(f => f !== flower);
-  renderFlowers(); // disappear instantly
-  alert(flower.name + " locally removed.");
-  return;
- }
-
-  // If it was already saved in Supabase, delete there too
-  if (flower.saved) {
-   // const tenantId = localStorage.getItem("tenantId");
-    const { error } = await supabase
-      .from("flowers")
-      .delete()
-      .eq("id", flower.id)
-      .eq("tenant_id", tenantId);
-
-    if (error) {
-      alert("Error deleting flower from database: " + error.message);
-      // Optional: add it back to local array if you want
-      flowers.unshift(flower);
-    // {alert(flower.name + " removed.");} 
-      renderFlowers();
-    }
-  }
-});*/
-row.querySelector(".removeFlower").addEventListener("click", async () => {
   try {
       const tenantId = localStorage.getItem("tenantId");
 
@@ -198,6 +169,32 @@ row.querySelector(".removeFlower").addEventListener("click", async () => {
     console.error("Unexpected error removing flower:", err);
     alert("Unexpected error removing flower. Check console for details.");
   }
+});*/
+
+
+row.querySelector(".removeFlower").addEventListener("click", async () => {
+  if (!confirm(`Remove ${flower.name}?`)) return;
+
+  const tenantId = localStorage.getItem("tenantId");
+
+  // Only try deleting from Supabase if this flower is already saved
+  if (flower.saved) {
+    const { error } = await supabase
+      .from("flowers")
+      .delete()
+      .eq("id", flower.id)
+      .eq("tenant_id", tenantId);
+
+    if (error) {
+      console.error("Failed to remove flower from database:", error);
+      alert("Error deleting flower from database: " + error.message);
+      return;
+    }
+  }
+
+  // ✅ Remove from local array *after* successful delete or if unsaved
+  flowers = flowers.filter(f => f.id !== flower.id);
+  renderFlowers();
 });
 
 
