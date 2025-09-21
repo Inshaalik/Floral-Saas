@@ -237,6 +237,7 @@ if (flowersMoreButton) {
 
     function renderHardGoods() {
         hardGoodsTable.innerHTML = "";
+        hardGoods.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
         hardGoods.forEach(item => {
             const row = document.createElement("tr");
             row.innerHTML = `
@@ -319,6 +320,7 @@ if (flowersMoreButton) {
 
     function renderDesigners() {
         designerList.innerHTML = "";
+       designers.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
         designers.forEach(designer => {
             const row = document.createElement("tr");
             row.innerHTML = `
@@ -337,6 +339,12 @@ if (flowersMoreButton) {
         row.querySelector(".saveDesigner").addEventListener("click", async () => {
             try {
                 const tenantId = localStorage.getItem("tenantId");
+                const name = designer.name.trim();
+                if (!name) {
+                    alert("Designer name cannot be empty.");
+                    return;
+                }
+        
                 if (!designer.saved) {
                     // Add new designer
                     const { data, error } = await supabase
@@ -351,7 +359,7 @@ if (flowersMoreButton) {
                     // Update existing designer
                     const { error } = await supabase
                         .from("designers")
-                        .update({ name: designer.name })
+                        .update({ name })
                         .eq("id", designer.id)
                         .eq("tenant_id", tenantId);
                     if (error) throw error;
@@ -361,7 +369,8 @@ if (flowersMoreButton) {
             } catch (err) {
                 console.error("Error saving designer:", err);
                 alert("Error saving designer: " + err.message);
-            }
+             
+             }
         });
 
         // Remove button
@@ -391,7 +400,6 @@ if (flowersMoreButton) {
         });
     });
 }
-
     // ----- Buttons -----
     addFlowerButton.addEventListener("click", () => {
         const tenantId = localStorage.getItem("tenantId");
