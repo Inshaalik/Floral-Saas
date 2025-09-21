@@ -243,7 +243,7 @@ if (flowersMoreButton) {
                 <td><input type="text" class="hardGoodName" value="${item.name}"></td>
                 <td><input type="number" class="hardGoodPrice" value="${item.price}"></td>
                 <td>
-                   <button class="saveHardGood">${item.saved ? 'Update' : 'Add'}</button>
+                   <button class="saveHardGood">${item.saved ? 'Add' : 'Update'}</button>
                 <button class="removeHardGood">Remove</button>
                 </td>
             `;
