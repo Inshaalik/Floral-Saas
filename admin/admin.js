@@ -68,7 +68,7 @@ if (flowersCurrentLetter !== "All") {
 }
 
 // 2️⃣ Paginate
-const flowersToShow = filteredFlowers.slice(0, flowersRowsShown);
+//const flowersToShow = filteredFlowers.slice(0, flowersRowsShown);
 
 // 3️⃣ Render only the filtered & paginated flowers
 flowersToShow.forEach(flower => {
@@ -164,39 +164,39 @@ const tenantId = localStorage.getItem("tenantId");
   }
 });*/
 row.querySelector(".removeFlower").addEventListener("click", async () => {
-    const tenantId = localStorage.getItem("tenantId");
+  try {
+    // 1️⃣ Remove from local array first (immediate UI update)
+    flowers = flowers.filter(f => f.id !== flower.id);
+    renderFlowers();
 
-    if (!flower.saved) {
-        // Unsaved flower, just remove locally
-        flowers = flowers.filter(f => f !== flower);
+    // 2️⃣ Only try to delete from Supabase if the flower was already saved
+    if (flower.saved) {
+      const tenantId = localStorage.getItem("tenantId");
+
+      // ✅ Delete by id only; we know this flower belongs to the current tenant
+      const { error } = await supabase
+        .from("flowers")
+        .delete()
+        .eq("id", flower.id)
+        .eq("tenant_id", tenantId);
+
+      if (error) {
+        console.error("Failed to remove flower from database:", error);
+        alert("Error deleting flower from database: " + error.message);
+
+        // Optional: put it back in local array if deletion fails
+        flowers.unshift(flower);
         renderFlowers();
-        alert("Flower removed locally.");
         return;
+      }
     }
 
-    try {
-        // Delete from Supabase first
-        const { data, error } = await supabase
-            .from("flowers")
-            .delete()
-            .eq("id", flower.id)
-            .eq("tenant_id", tenantId)
-            .select(); // select() ensures data comes back so we know if it was deleted
-
-        if (error) throw error;
-
-        if (!data || data.length === 0) {
-            throw new Error("Flower not found in database.");
-        }
-
-        // Remove locally only if DB delete succeeded
-        flowers = flowers.filter(f => f.id !== flower.id);
-        renderFlowers();
-        alert(`${flower.name} removed from database and locally.`);
-    } catch (err) {
-        console.error("Failed to delete flower:", err);
-        alert("Failed to remove flower from database: " + err.message);
-    }
+    // 3️⃣ Notify user
+    alert(flower.name + " removed!");
+  } catch (err) {
+    console.error("Unexpected error removing flower:", err);
+    alert("Unexpected error removing flower. Check console for details.");
+  }
 });
 
 
@@ -227,7 +227,7 @@ row.querySelector(".updateFlower").addEventListener("click", async () => {
   // Save (insert or update) in Supabase
   const { data, error } = await supabase
     .from("flowers")
-    .upsert([payload], { onConflict: ["id"] })
+    .upsert([payload], { onConflict: ["id", "tenant_id"] })
     .select();
 
   if (error) {
