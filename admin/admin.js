@@ -79,7 +79,7 @@ flowersToShow.forEach(flower => {
             <td><input type="number" step="0.01" class="flowerMarkup" value="${flower.markup || 1}"></td>
             <td><input type="number" step="0.01" class="flowerRetail" value="${flower.retail || 0}"></td>
             <td>
-            <button class="updateFlower">Update</button>
+            <button class="updateFlower">${btnText}</button>
             <button class="removeFlower">Remove</button>
             </td>
             
@@ -158,6 +158,52 @@ const tenantId = localStorage.getItem("tenantId");
         // 3️⃣ Re-render
         renderFlowers();
 });
+
+// ADD or UPDATE button
+row.querySelector(".updateFlower").addEventListener("click", async () => {
+  const tenantId = localStorage.getItem("tenantId");
+
+  // Read latest values from inputs
+  const name = row.querySelector(".flowerName").value.trim();
+  const wholesale = Number(row.querySelector(".flowerWholesale").value) || 0;
+  const markup = Number(row.querySelector(".flowerMarkup").value) || 1;
+  const retail = Number(row.querySelector(".flowerRetail").value) || 0;
+
+  // Update the local flower object
+  flower.name = name;
+  flower.wholesale = wholesale;
+  flower.markup = markup;
+  flower.retail = retail;
+
+  // Build payload for Supabase
+  const payload = {
+    ...flower,
+    tenant_id: tenantId
+  };
+
+  // Save (insert or update) in Supabase
+  const { data, error } = await supabase
+    .from("flowers")
+    .upsert([payload], { onConflict: ["id"] })
+    .select();
+
+  if (error) {
+    console.error("Supabase upsert error:", error);
+    alert("Error saving flower: " + error.message);
+    return;
+  }
+
+  // Mark saved and update local object with any new values from DB
+  flower.saved = true;
+  Object.assign(flower, data[0]);
+
+  alert(flower.name + " saved/updated!");
+  renderFlowers(); // refresh UI to show correct button text
+});
+
+
+
+
      /*   // 4️⃣ Optionally, show "More" button if there are more rows
 const flowersMoreButton = document.getElementById("flowersLoadMore");
 if (flowersMoreButton) {
