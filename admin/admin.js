@@ -134,12 +134,16 @@ const btnText = flower.saved ===false ? "Add" : "Update";
     }
 });
 
-row.querySelector(".removeFlower").addEventListener("click", async () => {
+/*row.querySelector(".removeFlower").addEventListener("click", async () => {
  // if (!confirm(`Remove ${flower.name || 'this flower'}?`)) return;
 const tenantId = localStorage.getItem("tenantId");
   // Remove locally first
-  flowers = flowers.filter(f => f.id !== flower.id);
+ if (!flower.id){
+     flowers = flowers.filter(f => f !== flower);
   renderFlowers(); // disappear instantly
+  alert(flower.name + " locally removed.");
+  return;
+ }
 
   // If it was already saved in Supabase, delete there too
   if (flower.saved) {
@@ -158,7 +162,43 @@ const tenantId = localStorage.getItem("tenantId");
       renderFlowers();
     }
   }
+});*/
+row.querySelector(".removeFlower").addEventListener("click", async () => {
+    const tenantId = localStorage.getItem("tenantId");
+
+    if (!flower.id) {
+        // Unsaved flower, just remove locally
+        flowers = flowers.filter(f => f !== flower);
+        renderFlowers();
+        alert("Flower removed locally.");
+        return;
+    }
+
+    try {
+        // Delete from Supabase first
+        const { data, error } = await supabase
+            .from("flowers")
+            .delete()
+            .eq("id", flower.id)
+            .eq("tenant_id", tenantId)
+            .select(); // select() ensures data comes back so we know if it was deleted
+
+        if (error) throw error;
+
+        if (!data || data.length === 0) {
+            throw new Error("Flower not found in database.");
+        }
+
+        // Remove locally only if DB delete succeeded
+        flowers = flowers.filter(f => f.id !== flower.id);
+        renderFlowers();
+        alert(`${flower.name} removed from database and locally.`);
+    } catch (err) {
+        console.error("Failed to delete flower:", err);
+        alert("Failed to remove flower from database: " + err.message);
+    }
 });
+
 
 // ADD or UPDATE button
 row.querySelector(".updateFlower").addEventListener("click", async () => {
