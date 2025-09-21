@@ -166,7 +166,7 @@ const tenantId = localStorage.getItem("tenantId");
 row.querySelector(".removeFlower").addEventListener("click", async () => {
     const tenantId = localStorage.getItem("tenantId");
 
-    if (!flower.id) {
+    if (!flower.saved) {
         // Unsaved flower, just remove locally
         flowers = flowers.filter(f => f !== flower);
         renderFlowers();
