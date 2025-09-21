@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let deletedFlowerIds = [];
     // ----- Pagination & Filter State -----
     let flowersCurrentLetter = "All"; // Default: show all
-    let flowersRowsShown = 10;        // Number of rows initially visible
+    let flowersRowsShown = 100;        // Number of rows initially visible
     const flowersRowsIncrement = 10;   // Number of rows to add when "Load More" is clicked
 
     // ----- DOM elements -----
