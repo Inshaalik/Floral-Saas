@@ -136,14 +136,14 @@ const btnText = flower.saved ===false ? "Add" : "Update";
 
 row.querySelector(".removeFlower").addEventListener("click", async () => {
  // if (!confirm(`Remove ${flower.name || 'this flower'}?`)) return;
-
+const tenantId = localStorage.getItem("tenantId");
   // Remove locally first
   flowers = flowers.filter(f => f.id !== flower.id);
   renderFlowers(); // disappear instantly
 
   // If it was already saved in Supabase, delete there too
   if (flower.saved) {
-    const tenantId = localStorage.getItem("tenantId");
+   // const tenantId = localStorage.getItem("tenantId");
     const { error } = await supabase
       .from("flowers")
       .delete()
@@ -153,10 +153,10 @@ row.querySelector(".removeFlower").addEventListener("click", async () => {
     if (error) {
       alert("Error deleting flower from database: " + error.message);
       // Optional: add it back to local array if you want
-      flowers.unshift(flower);}
-     {alert(flower.name + " removed.");} 
+      flowers.unshift(flower);
+    // {alert(flower.name + " removed.");} 
       renderFlowers();
-    
+    }
   }
 });
 
